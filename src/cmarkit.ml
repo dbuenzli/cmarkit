@@ -3019,7 +3019,7 @@ module Mapper = struct
       | Autolink _ | Break _ | Code_span _ | Raw_html _
       | Text _ | Ext_math_span _ as i -> Some i
       | Image (l, meta) ->
-          let* text = map_inline m l.text in
+          let text = Option.value ~default:Inline.empty (map_inline m l.text) in
           Some (Image ({ l with text }, meta))
       | Link (l, meta) ->
           let* text = map_inline m l.text in
