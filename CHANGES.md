@@ -1,6 +1,6 @@
 
-
-
+- Fix bug in `Block_lines.list_of_string`. Thanks to Rafał Gwoździński
+  for the report and the fix (#7, #8).
 - `Cmarkit.Mapper`. Fix non-sensical default map for `Image` nodes: do
   not delete `Image` nodes whose alt text maps to `None`, replace the
   alt text by `Inline.empty`. Thanks to Nicolás Ojeda Bär for the

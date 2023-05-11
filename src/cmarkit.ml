@@ -42,9 +42,9 @@ module Block_line = struct
     in
     loop s [] (String.length s - 1) 0 0
 
-  let flush ?(meta = Meta.none) s start last acc = match acc with
-  | [] -> [s, meta]
-  | acc -> (String.sub s start (last - start + 1), meta) :: acc
+  let flush ?(meta = Meta.none) s start last acc =
+    let sub = String.sub s start (last - start + 1) in
+    (sub, meta) :: acc
 
   let flush_tight ?(meta = Meta.none) s start last acc =
     (* If [s] has newlines, blanks after newlines are layout *)
