@@ -1,3 +1,5 @@
+v0.2.0 2023-05-10 La Forclaz (VS)
+---------------------------------
 
 - Fix bug in `Block_lines.list_of_string`. Thanks to Rafał Gwoździński
   for the report and the fix (#7, #8).
