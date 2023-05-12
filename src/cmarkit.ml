@@ -44,9 +44,7 @@ module Block_line = struct
 
   let flush ?(meta = Meta.none) s start last acc =
     let sub = String.sub s start (last - start + 1) in
-    match acc with
-    | [] -> [sub, meta]
-    | acc -> (sub, meta) :: acc
+    (sub, meta) :: acc
 
   let flush_tight ?(meta = Meta.none) s start last acc =
     (* If [s] has newlines, blanks after newlines are layout *)
