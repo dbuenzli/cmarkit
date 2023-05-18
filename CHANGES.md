@@ -1,3 +1,8 @@
+
+- `List_item.make`, change default value of `after_marker` from 0 to 1.
+  We don't want to generate invalid CommonMark by default. Thanks to 
+  Rafał Gwoździński for the report (#9).
+
 v0.2.0 2023-05-10 La Forclaz (VS)
 ---------------------------------
 

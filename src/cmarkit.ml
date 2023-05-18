@@ -585,7 +585,7 @@ module Block = struct
         ext_task_marker : Uchar.t node option }
 
     let make
-        ?(before_marker = 0) ?(marker = Layout.empty) ?(after_marker = 0)
+        ?(before_marker = 0) ?(marker = Layout.empty) ?(after_marker = 1)
         ?ext_task_marker block
       =
       { before_marker; marker; after_marker; block; ext_task_marker }
