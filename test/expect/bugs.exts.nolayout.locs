@@ -61,7 +61,7 @@ File "bugs.exts.md", lines 1-25
   Blank line:
   File "bugs.exts.md", line 17
   Table:
-  File "bugs.exts.md", lines 18-23, characters 0-27
+  File "bugs.exts.md", lines 18-24, characters 0-27
     Header row:
     File "bugs.exts.md", line 18, characters 0-27
       Text:
@@ -138,7 +138,17 @@ File "bugs.exts.md", lines 1-25
           File "bugs.exts.md", line 23, characters 14-15
         Text:
         File "bugs.exts.md", line 23, characters 16-21
-  Blank line:
-  File "bugs.exts.md", line 24
+    Data row:
+    File "bugs.exts.md", line 24, characters 0-27
+      Inlines:
+      File "bugs.exts.md", line 24, characters 2-8
+        Emphasis:
+        File "bugs.exts.md", line 24, characters 2-5
+          Text:
+          File "bugs.exts.md", line 24, characters 3-4
+        Code span:
+        File "bugs.exts.md", line 24, characters 5-8
+          Code span line:
+          File "bugs.exts.md", line 24, characters 6-7
   Blank line:
   File "bugs.exts.md", line 25

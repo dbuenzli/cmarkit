@@ -27,6 +27,8 @@ get dropped.
 \\
 {before\texttt{a}or\texttt{b}after}
 \\
+{\emph{a}\texttt{a}}
+\\
 \hline
 \end{tabular}
 \bigskip

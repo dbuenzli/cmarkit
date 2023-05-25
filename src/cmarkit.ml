@@ -1883,6 +1883,8 @@ module Inline_struct = struct
           (make_col p is, (blanks_before, after)), [], k
       | `Not_found _ -> assert false
       end
+  | Inline { start; inline; next } :: toks when k >= start ->
+      finish_col p line blanks_before (inline :: is) toks next
   | Inline { start; inline; next } :: toks as toks' ->
       begin match find_pipe p line ~before:start k with
       | `Not_found text ->
