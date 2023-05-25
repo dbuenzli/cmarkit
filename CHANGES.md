@@ -1,4 +1,8 @@
 
+- Fix table extension column parsing, toplevel text inlines 
+  where being dropped. Thanks to Javier Chávarri for the 
+  report (#10).
+
 - `List_item.make`, change default value of `after_marker` from 0 to 1.
   We don't want to generate invalid CommonMark by default. Thanks to 
   Rafał Gwoździński for the report (#9).

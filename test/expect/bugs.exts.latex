@@ -29,6 +29,10 @@ get dropped.
 \\
 {\emph{a}\texttt{a}}
 \\
+{% Raw CommonMark HTML omitted
+foo% Raw CommonMark HTML omitted
+}
+\\
 \hline
 \end{tabular}
 \bigskip

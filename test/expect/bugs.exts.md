@@ -22,3 +22,4 @@ get dropped.
 | before `a` or `b`after  |
 | before`a`or`b`after     |
 | *a*`a`                  |
+| <p>foo</p>              |

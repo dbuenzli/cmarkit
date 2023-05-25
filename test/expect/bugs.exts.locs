@@ -1,5 +1,5 @@
 Blocks:
-File "bugs.exts.md", lines 1-25
+File "bugs.exts.md", lines 1-26
   Heading, level 1:
   File "bugs.exts.md", lines 1-2, characters 0-4
     Text:
@@ -61,7 +61,7 @@ File "bugs.exts.md", lines 1-25
   Blank line:
   File "bugs.exts.md", line 17
   Table:
-  File "bugs.exts.md", lines 18-24, characters 0-27
+  File "bugs.exts.md", lines 18-25, characters 0-27
     Header row:
     File "bugs.exts.md", line 18, characters 0-27
       Text:
@@ -150,5 +150,19 @@ File "bugs.exts.md", lines 1-25
         File "bugs.exts.md", line 24, characters 5-8
           Code span line:
           File "bugs.exts.md", line 24, characters 6-7
+    Data row:
+    File "bugs.exts.md", line 25, characters 0-27
+      Inlines:
+      File "bugs.exts.md", line 25, characters 2-12
+        Raw HTML:
+        File "bugs.exts.md", line 25, characters 2-5
+          Raw HTML line:
+          File "bugs.exts.md", line 25, characters 2-5
+        Text:
+        File "bugs.exts.md", line 25, characters 5-8
+        Raw HTML:
+        File "bugs.exts.md", line 25, characters 8-12
+          Raw HTML line:
+          File "bugs.exts.md", line 25, characters 8-12
   Blank line:
-  File "bugs.exts.md", line 25
+  File "bugs.exts.md", line 26
