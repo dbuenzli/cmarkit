@@ -10,3 +10,14 @@ follows:
 The triggering CommonMark
 ```
 
+# Bug \#10 
+
+In cells toplevel text nodes not at the beginning or end of the cell
+get dropped.
+
+|  Foo                    |
+|-------------------------|
+| `a` or `b`             |
+| before `a` or `b`after |
+
+

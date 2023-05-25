@@ -212,5 +212,18 @@ follows:</p>
 
 The triggering CommonMark
 </code></pre>
-</body>
+<h1>Bug #10</h1>
+<p>In cells toplevel text nodes not at the beginning or end of the cell
+get dropped.</p>
+<div role="region"><table>
+<tr>
+<th>Foo</th>
+</tr>
+<tr>
+<td><code>a</code> or <code>b</code></td>
+</tr>
+<tr>
+<td>before <code>a</code> or <code>b</code>after</td>
+</tr>
+</table></div></body>
 </html>

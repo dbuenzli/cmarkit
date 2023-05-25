@@ -8,3 +8,21 @@ follows:
 
 The triggering CommonMark
 \end{verbatim}
+
+\section{Bug \#10}
+
+In cells toplevel text nodes not at the beginning or end of the cell
+get dropped.
+
+\bigskip
+\begin{tabular}{l}
+{\bfseries{}Foo}
+\\
+\hline
+{\texttt{a} or \texttt{b}}
+\\
+{before \texttt{a} or \texttt{b}after}
+\\
+\hline
+\end{tabular}
+\bigskip
