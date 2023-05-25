@@ -21,7 +21,11 @@ get dropped.
 \hline
 {\texttt{a} or \texttt{b}}
 \\
+{before \texttt{a} or \texttt{b} after}
+\\
 {before \texttt{a} or \texttt{b}after}
+\\
+{before\texttt{a}or\texttt{b}after}
 \\
 \hline
 \end{tabular}

@@ -1887,7 +1887,7 @@ module Inline_struct = struct
       begin match find_pipe p line ~before:start k with
       | `Not_found text ->
           let is = inline :: text :: is in
-          finish_col p line blanks_before is toks (next + 1)
+          finish_col p line blanks_before is toks next
       | `Found (text, after, k) ->
           let is = match text with Some t -> t :: is | None -> is in
           (make_col p is, (blanks_before, after)), toks', k
