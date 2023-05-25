@@ -123,7 +123,8 @@ let expect_test =
   let render_tests file acc =
     let run_test (cmd, ext) acc =
       let cwd = B0_expect.base exp and stdout = Fpath.(file -+ ext) in
-      let with_exts = Fpath.basename file = "exts.md" in
+      let base = Fpath.basename file in
+      let with_exts = String.ends_with ~suffix:"exts.md" base in
       let inf = Fpath.strip_prefix cwd file |> Option.get in
       let cmd = Cmd.(cmd %% if' with_exts (atom "--exts") %% path inf) in
       let* o = B0_expect.stdout exp ~cwd ~stdout Cmd.(trip %% cmd) in
