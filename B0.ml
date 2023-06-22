@@ -100,48 +100,50 @@ let examples =
   let doc = "Doc sample code" in
   B0_ocaml.exe "examples" ~doc ~meta ~srcs ~requires
 
-let expect_trip_spec exp env =
-  (* FIXME b0 *)
-  let trip_spec = Cmd.(atom "b0" % "--path" % "--" % "trip_spec") in
-  let* trip_spec = Result.map Cmd.atom (Os.Cmd.run_out ~trim:true trip_spec) in
-  let stdout = Fpath.(B0_expect.base exp / "spec.trip") in
-  let cwd = B0_cmdlet.Env.scope_dir env in
-  B0_expect.stdout exp ~cwd ~stdout trip_spec
+(* Expectation tests *)
 
-let expect_test =
-  (* FIXME B0_expect, There's still a bit to streamline here *)
-  let doc = "Test the expectations" in
-  B0_cmdlet.v "test_expect" ~doc @@ fun env args ->
-  B0_cmdlet.exit_of_result' @@
-  (* FIXME b0 *)
-  let trip = Cmd.(atom "b0" % "--path" % "--" % "cmarkit") in
-  let* trip = Result.map Cmd.atom (Os.Cmd.run_out ~trim:true trip) in
-  let* exp = B0_expect.make env ~base:Fpath.(v "test/expect") in
-  let* base_files = B0_expect.base_files exp ~recurse:false in
-  let is_input f = Fpath.has_ext ".md" f && not (Fpath.has_ext ".trip.md" f) in
-  let test_files = List.filter is_input base_files in
-  let render_tests file acc =
-    let run_test (cmd, ext) acc =
-      let cwd = B0_expect.base exp and stdout = Fpath.(file -+ ext) in
-      let base = Fpath.basename file in
-      let with_exts = String.ends_with ~suffix:"exts.md" base in
-      let inf = Fpath.strip_prefix cwd file |> Option.get in
-      let cmd = Cmd.(cmd %% if' with_exts (atom "--exts") %% path inf) in
-      let* o = B0_expect.stdout exp ~cwd ~stdout Cmd.(trip %% cmd) in
-      Ok (o :: acc)
-    in
-    let renderers =
-      [ Cmd.(atom "html" % "-c" % "--unsafe"), ".html";
-        Cmd.(atom "latex"), ".latex";
-        Cmd.(atom "commonmark"), ".trip.md";
-        Cmd.(atom "locs"), ".locs";
-        Cmd.(atom "locs" % "--no-layout"), ".nolayout.locs"; ]
-    in
-    List.fold_stop_on_error run_test renderers acc
+let get_expect_exe exe = (* FIXME b0 *)
+  B0_expect.result_to_abort @@
+  let expect = Cmd.(atom "b0" % "--path" % "--" % exe) in
+  Result.map Cmd.atom (Os.Cmd.run_out ~trim:true expect)
+
+let expect_trip_spec ctx =
+  let trip_spec = get_expect_exe "trip_spec" in
+  let cwd = B0_cmdlet.Env.scope_dir (B0_expect.env ctx) in
+  B0_expect.stdout ctx ~cwd ~stdout:(Fpath.v "spec.trip") trip_spec
+
+let expect_cmarkit_renders ctx =
+  let renderers = (* command, output suffix *)
+    [ Cmd.(atom "html" % "-c" % "--unsafe"), ".html";
+      Cmd.(atom "latex"), ".latex";
+      Cmd.(atom "commonmark"), ".trip.md";
+      Cmd.(atom "locs"), ".locs";
+      Cmd.(atom "locs" % "--no-layout"), ".nolayout.locs"; ]
   in
-  let* os = List.fold_stop_on_error render_tests test_files [] in
-  let* o = expect_trip_spec exp env in
-  Ok (B0_expect.log_results exp (o :: os))
+  let test_renderer ctx cmarkit file (cmd, ext) =
+    let with_exts = Fpath.has_ext ".exts.md" file in
+    let cmd = Cmd.(cmd %% if' with_exts (atom "--exts") %% path file) in
+    let cwd = B0_expect.base ctx and stdout = Fpath.(file -+ ext) in
+    B0_expect.stdout ctx ~cwd ~stdout Cmd.(cmarkit %% cmd)
+  in
+  let test_file ctx cmarkit file =
+    List.iter (test_renderer ctx cmarkit file) renderers
+  in
+  let cmarkit = get_expect_exe "cmarkit" in
+  let test_files =
+    let base_files = B0_expect.base_files ctx ~rel:true ~recurse:false in
+    let input f = Fpath.has_ext ".md" f && not (Fpath.has_ext ".trip.md" f) in
+    List.filter input base_files
+  in
+  List.iter (test_file ctx cmarkit) test_files
+
+let expect =
+  let doc = "Test expectations" in
+  B0_cmdlet.v "expect" ~doc @@ fun env args ->
+  B0_expect.cmdlet env args ~base:(Fpath.v "test/expect") @@ fun ctx ->
+  expect_cmarkit_renders ctx;
+  expect_trip_spec ctx;
+  ()
 
 (* Packs *)
 

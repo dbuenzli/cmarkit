@@ -14,7 +14,8 @@ To add a new test, add an `.md` test in `test/expect`, run the tests
 and add the new generated files to the repo.
 
 ```sh
-b0 -- test_expect
+b0 -- expect
+b0 -- expect --help 
 ```
 
 # Specification tests
