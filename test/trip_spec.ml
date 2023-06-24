@@ -5,7 +5,7 @@
 
 open B0_std
 open Result.Syntax
-open B00_serialk_json
+open B0_json
 
 let notrip_reasons =
   (* For those renders that are only correct we indicate here

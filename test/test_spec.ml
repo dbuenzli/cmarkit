@@ -5,7 +5,7 @@
 
 open B0_std
 open Result.Syntax
-open B00_serialk_json
+open B0_json
 
 let status ~pass ex_num =
   Log.app @@ fun m ->

@@ -56,8 +56,8 @@ See also [`bench.ml`] and the [doc examples].
 
 ## Acknowledgements
 
-A grant from the [OCaml Software Foundation] helped to bring the first 
-public release of `cmarkit`. 
+A grant from the [OCaml Software Foundation] helped to bring the first
+public release of `cmarkit`.
 
 The `cmarkit` implementation benefited from the work of John
 MacFarlane ([spec][CommonMark specification], [`cmark`]) and Martin

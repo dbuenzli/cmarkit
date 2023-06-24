@@ -13,7 +13,7 @@ let cmdliner = B0_ocaml.libname "cmdliner"
 let uucp = B0_ocaml.libname "uucp"
 
 let b0_std = B0_ocaml.libname "b0.std"
-let b0_b00_kit = B0_ocaml.libname "b0.b00.kit"
+let b0_file = B0_ocaml.libname "b0.file"
 
 (* Libraries *)
 
@@ -57,7 +57,7 @@ let update_spec_tests =
   in
   let dest = B0_cmdlet.in_scope_dir env (Fpath.v ("test/spec.json")) in
   let dest = Os.Cmd.out_file ~force:true ~make_path:false dest in
-  let* curl = Os.Cmd.get Cmd.(atom "curl" % "-L" % tests) in
+  let* curl = Os.Cmd.get Cmd.(arg "curl" % "-L" % tests) in
   Os.Cmd.run ~stdout:dest curl
 
 let spec_srcs = Fpath.[`File (v "test/spec.ml"); `File (v "test/spec.mli")]
@@ -71,7 +71,7 @@ let bench =
 
 let test_spec =
   let srcs = Fpath.(`File (v "test/test_spec.ml") :: spec_srcs) in
-  let requires = [ b0_std; b0_b00_kit; cmarkit ] in
+  let requires = [ b0_std; b0_file; cmarkit ] in
   let meta =
     B0_meta.(empty |> add B0_unit.Action.exec_cwd B0_unit.Action.scope_cwd)
   in
@@ -80,7 +80,7 @@ let test_spec =
 
 let trip_spec =
   let srcs = Fpath.(`File (v "test/trip_spec.ml") :: spec_srcs) in
-  let requires = [ b0_std; b0_b00_kit; cmarkit ] in
+  let requires = [ b0_std; b0_file; cmarkit ] in
   let meta =
     B0_meta.(empty |> add B0_unit.Action.exec_cwd B0_unit.Action.scope_cwd)
   in
@@ -104,8 +104,8 @@ let examples =
 
 let get_expect_exe exe = (* FIXME b0 *)
   B0_expect.result_to_abort @@
-  let expect = Cmd.(atom "b0" % "--path" % "--" % exe) in
-  Result.map Cmd.atom (Os.Cmd.run_out ~trim:true expect)
+  let expect = Cmd.(arg "b0" % "--path" % "--" % exe) in
+  Result.map Cmd.arg (Os.Cmd.run_out ~trim:true expect)
 
 let expect_trip_spec ctx =
   let trip_spec = get_expect_exe "trip_spec" in
@@ -114,15 +114,15 @@ let expect_trip_spec ctx =
 
 let expect_cmarkit_renders ctx =
   let renderers = (* command, output suffix *)
-    [ Cmd.(atom "html" % "-c" % "--unsafe"), ".html";
-      Cmd.(atom "latex"), ".latex";
-      Cmd.(atom "commonmark"), ".trip.md";
-      Cmd.(atom "locs"), ".locs";
-      Cmd.(atom "locs" % "--no-layout"), ".nolayout.locs"; ]
+    [ Cmd.(arg "html" % "-c" % "--unsafe"), ".html";
+      Cmd.(arg "latex"), ".latex";
+      Cmd.(arg "commonmark"), ".trip.md";
+      Cmd.(arg "locs"), ".locs";
+      Cmd.(arg "locs" % "--no-layout"), ".nolayout.locs"; ]
   in
   let test_renderer ctx cmarkit file (cmd, ext) =
     let with_exts = Fpath.has_ext ".exts.md" file in
-    let cmd = Cmd.(cmd %% if' with_exts (atom "--exts") %% path file) in
+    let cmd = Cmd.(cmd %% if' with_exts (arg "--exts") %% path file) in
     let cwd = B0_expect.base ctx and stdout = Fpath.(file -+ ext) in
     B0_expect.stdout ctx ~cwd ~stdout Cmd.(cmarkit %% cmd)
   in

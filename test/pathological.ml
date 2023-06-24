@@ -104,7 +104,7 @@ let tests =
 (* Run commands on a deadline. Something like this should be added to B0_kit. *)
 
 type deadline_exit = [ Os.Cmd.status | `Timeout ]
-type deadline_run = Mtime.span * deadline_exit
+type deadline_run = Mtime.Span.t * deadline_exit
 
 let deadline_run ~timeout ?env ?cwd ?stdin ?stdout ?stderr cmd =
   let rec wait ~deadline dur pid =
