@@ -1,4 +1,7 @@
 
+- Data updated for Unicode 15.1.0 (no changes except 
+  for the value of `Cmarkit.Doc.unicode_version`).
+
 - Fix table extension column parsing, toplevel text inlines were being
   dropped. Thanks to Javier Chávarri for the report (#10).
 
