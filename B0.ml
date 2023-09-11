@@ -18,101 +18,108 @@ let b0_file = B0_ocaml.libname "b0.file"
 (* Libraries *)
 
 let cmarkit_lib =
-  let srcs = Fpath.[ `Dir (v "src") ] in
+  let srcs = [ `Dir ~/"src" ] in
   let requires = [] and name = "cmarkit-lib" in
   B0_ocaml.lib cmarkit ~name ~doc:"The cmarkit library" ~srcs ~requires
 
 (* Tools *)
 
 let cmarkit_tool =
-  let srcs = Fpath.[`Dir (v "tool")] in
+  let srcs = [ `Dir ~/"tool" ] in
   let requires = [cmarkit; cmdliner] in
-  B0_ocaml.exe "cmarkit" ~doc:"The cmarkit tool" ~srcs ~requires
+  B0_ocaml.exe "cmarkit" ~public:true ~doc:"The cmarkit tool" ~srcs ~requires
 
-(* Unicode support *)
+(* Unicode support
+
+   XXX we could do without both an exe and an action, cf. the Unicode libs. *)
 
 let unicode_data =
-  let srcs = Fpath.[`File (v "support/unicode_data.ml")] in
+  let srcs = [ `File ~/"support/unicode_data.ml" ] in
   let requires = [uucp] in
   let doc = "Generate cmarkit Unicode data" in
   B0_ocaml.exe "unicode_data" ~doc ~srcs ~requires
 
 let update_unicode =
-  B0_cmdlet.v "update_unicode_data" ~doc:"Update Unicode character data" @@
-  fun env _args -> B0_cmdlet.exit_of_result @@
-  (* FIXME b0 *)
-  let b0 = Os.Cmd.get_tool (Fpath.v "b0") |> Result.get_ok in
-  let unicode_data = Cmd.(path b0 % "--" % "unicode_data") in
-  let outf = B0_cmdlet.in_scope_dir env (Fpath.v "src/cmarkit_data_uchar.ml") in
+  let doc = "Update Unicode character data " in
+  B0_action.make' "update_unicode_data" ~units:[unicode_data] ~doc @@
+  fun _ env ~args:_ ->
+  let* unicode_data = B0_env.unit_cmd env unicode_data in
+  let outf = B0_env.in_scope_dir env ~/"src/cmarkit_data_uchar.ml" in
   let outf = Os.Cmd.out_file ~force:true ~make_path:false outf in
   Os.Cmd.run ~stdout:outf unicode_data
 
 (* Tests *)
 
 let update_spec_tests =
-  B0_cmdlet.v "update_spec_tests" ~doc:"Update the CommonMark spec tests" @@
-  fun env _args -> B0_cmdlet.exit_of_result @@
+  B0_action.make' "update_spec_tests" ~doc:"Update the CommonMark spec tests" @@
+  fun _ env ~args:_ ->
   let tests =
     Fmt.str "https://spec.commonmark.org/%s/spec.json" commonmark_version
   in
-  let dest = B0_cmdlet.in_scope_dir env (Fpath.v ("test/spec.json")) in
+  let dest = B0_env.in_scope_dir env ~/"test/spec.json" in
   let dest = Os.Cmd.out_file ~force:true ~make_path:false dest in
-  let* curl = Os.Cmd.get Cmd.(arg "curl" % "-L" % tests) in
+  let* curl = B0_env.get_cmd env Cmd.(arg "curl" % "-L" % tests) in
   Os.Cmd.run ~stdout:dest curl
 
-let spec_srcs = Fpath.[`File (v "test/spec.ml"); `File (v "test/spec.mli")]
+let spec_srcs = [`File ~/"test/spec.mli"; `File ~/"test/spec.ml"]
 
 let bench =
-  let srcs = Fpath.[`File (v "test/bench.ml")] in
+  let doc = "Simple standard CommonMark to HTML renderer for benchmarking" in
+  let srcs = [ `File ~/"test/bench.ml" ] in
   let requires = [cmarkit] in
   let meta = B0_meta.(empty |> tag bench) in
-  let doc = "Simple standard CommonMark to HTML renderer for benchmarking" in
   B0_ocaml.exe "bench" ~doc ~meta ~srcs ~requires
 
 let test_spec =
-  let srcs = Fpath.(`File (v "test/test_spec.ml") :: spec_srcs) in
+  let doc = "Test CommonMark specification conformance tests" in
+  let srcs = `File ~/"test/test_spec.ml" :: spec_srcs in
   let requires = [ b0_std; b0_file; cmarkit ] in
   let meta =
-    B0_meta.(empty |> add B0_unit.Action.exec_cwd B0_unit.Action.scope_cwd)
+    B0_meta.empty
+    |> B0_meta.tag B0_meta.test
+    |> B0_meta.add B0_unit.exec_cwd `Scope_dir
   in
-  let doc = "Test CommonMark specification conformance tests" in
   B0_ocaml.exe "test_spec" ~doc ~meta ~srcs ~requires
 
 let trip_spec =
-  let srcs = Fpath.(`File (v "test/trip_spec.ml") :: spec_srcs) in
+  let doc = "Test CommonMark renderer on conformance tests" in
+  let srcs = `File ~/"test/trip_spec.ml" :: spec_srcs in
   let requires = [ b0_std; b0_file; cmarkit ] in
   let meta =
-    B0_meta.(empty |> add B0_unit.Action.exec_cwd B0_unit.Action.scope_cwd)
+    B0_meta.empty
+    |> B0_meta.tag B0_meta.test
+    |> B0_meta.add B0_unit.exec_cwd `Scope_dir
   in
-  let doc = "Test CommonMark renderer on conformance tests" in
   B0_ocaml.exe "trip_spec" ~doc ~meta ~srcs ~requires
 
 let pathological =
-  let srcs = Fpath.[`File (v "test/pathological.ml")] in
-  let requires = [ b0_std ] in
   let doc = "Test a CommonMark parser on pathological tests." in
+  let srcs = [ `File ~/"test/pathological.ml" ] in
+  let requires = [ b0_std ] in
   B0_ocaml.exe "pathological" ~doc ~srcs ~requires
 
 let examples =
-  let srcs = Fpath.[`File (v "test/examples.ml")] in
-  let requires = [cmarkit] in
-  let meta = B0_meta.(empty |> tag test) in
   let doc = "Doc sample code" in
+  let srcs = [ `File ~/"test/examples.ml" ] in
+  let requires = [ cmarkit ] in
+  let meta = B0_meta.empty |> B0_meta.(tag test) in
   B0_ocaml.exe "examples" ~doc ~meta ~srcs ~requires
 
 (* Expectation tests *)
 
-let get_expect_exe exe = (* FIXME b0 *)
-  B0_expect.result_to_abort @@
-  let expect = Cmd.(arg "b0" % "--path" % "--" % exe) in
-  Result.map Cmd.arg (Os.Cmd.run_out ~trim:true expect)
-
 let expect_trip_spec ctx =
-  let trip_spec = get_expect_exe "trip_spec" in
-  let cwd = B0_cmdlet.Env.scope_dir (B0_expect.env ctx) in
+  let trip_spec = (* TODO b0 something more convenient. *)
+    B0_env.unit_cmd (B0_expect.env ctx) trip_spec
+    |> B0_expect.result_to_abort
+  in
+  let cwd = B0_env.scope_dir (B0_expect.env ctx) in
   B0_expect.stdout ctx ~cwd ~stdout:(Fpath.v "spec.trip") trip_spec
 
 let expect_cmarkit_renders ctx =
+  let cmarkit = (* TODO b0 something more convenient. *)
+    B0_env.unit_cmd (B0_expect.env ctx) cmarkit_tool
+    |> B0_expect.result_to_abort
+  in
   let renderers = (* command, output suffix *)
     [ Cmd.(arg "html" % "-c" % "--unsafe"), ".html";
       Cmd.(arg "latex"), ".latex";
@@ -129,7 +136,6 @@ let expect_cmarkit_renders ctx =
   let test_file ctx cmarkit file =
     List.iter (test_renderer ctx cmarkit file) renderers
   in
-  let cmarkit = get_expect_exe "cmarkit" in
   let test_files =
     let base_files = B0_expect.base_files ctx ~rel:true ~recurse:false in
     let input f = Fpath.has_ext ".md" f && not (Fpath.has_ext ".trip.md" f) in
@@ -139,8 +145,8 @@ let expect_cmarkit_renders ctx =
 
 let expect =
   let doc = "Test expectations" in
-  B0_cmdlet.v "expect" ~doc @@ fun env args ->
-  B0_expect.cmdlet env args ~base:(Fpath.v "test/expect") @@ fun ctx ->
+  B0_action.make "expect" ~units:[trip_spec; cmarkit_tool] ~doc  @@
+  B0_expect.action_func ~base:(Fpath.v "test/expect") @@ fun ctx ->
   expect_cmarkit_renders ctx;
   expect_trip_spec ctx;
   ()
@@ -149,24 +155,24 @@ let expect =
 
 let default =
   let meta =
-    let open B0_meta in
-    empty
-    |> add authors ["The cmarkit programmers"]
-    |> add maintainers ["Daniel Bünzli <daniel.buenzl i@erratique.ch>"]
-    |> add homepage "https://erratique.ch/software/cmarkit"
-    |> add online_doc "https://erratique.ch/software/cmarkit/doc"
-    |> add licenses ["ISC"]
-    |> add repo "git+https://erratique.ch/repos/cmarkit.git"
-    |> add issues "https://github.com/dbuenzli/cmarkit/issues"
-    |> add description_tags
+    B0_meta.empty
+    |> B0_meta.(add authors) ["The cmarkit programmers"]
+    |> B0_meta.(add maintainers)
+       ["Daniel Bünzli <daniel.buenzl i@erratique.ch>"]
+    |> B0_meta.(add homepage) "https://erratique.ch/software/cmarkit"
+    |> B0_meta.(add online_doc) "https://erratique.ch/software/cmarkit/doc"
+    |> B0_meta.(add licenses) ["ISC"]
+    |> B0_meta.(add repo) "git+https://erratique.ch/repos/cmarkit.git"
+    |> B0_meta.(add issues) "https://github.com/dbuenzli/cmarkit/issues"
+    |> B0_meta.(add description_tags)
       ["codec"; "commonmark"; "markdown"; "org:erratique"; ]
-    |> add B0_opam.Meta.build
+    |> B0_meta.tag B0_opam.tag
+    |> B0_meta.add B0_opam.build
       {|[["ocaml" "pkg/pkg.ml" "build" "--dev-pkg" "%{dev}%"
                   "--with-cmdliner" "%{cmdliner:installed}%"]]|}
-    |> tag B0_opam.tag
-    |> add B0_opam.Meta.depopts ["cmdliner", ""]
-    |> add B0_opam.Meta.conflicts [ "cmdliner", {|< "1.1.0"|}]
-    |> add B0_opam.Meta.depends
+    |> B0_meta.add B0_opam.depopts ["cmdliner", ""]
+    |> B0_meta.add B0_opam.conflicts [ "cmdliner", {|< "1.1.0"|}]
+    |> B0_meta.add B0_opam.depends
       [ "ocaml", {|>= "4.14.0"|};
         "ocamlfind", {|build|};
         "ocamlbuild", {|build|};
@@ -175,5 +181,5 @@ let default =
         "b0", {|dev & with-test|};
       ]
   in
-  B0_pack.v "default" ~doc:"cmarkit package" ~meta ~locked:true @@
+  B0_pack.make "default" ~doc:"cmarkit package" ~meta ~locked:true @@
   B0_unit.list ()

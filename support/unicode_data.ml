@@ -105,11 +105,12 @@ let case_fold =@?
 %!|} Uucp.unicode_version pp_cps whitespace_list pp_cps punctuation_list
      pp_map case_fold_map
 
-
-let () = match Array.to_list Sys.argv with
+let main () = match Array.to_list Sys.argv with
 | _ :: "-t" :: [] -> test ()
 | _ :: [] -> gen ()
 | _ -> Printf.printf "Usage: %s [-t]\n%!" Sys.argv.(0)
+
+let () = if !Sys.interactive then () else main ()
 
 (*---------------------------------------------------------------------------
    Copyright (c) 2021 The cmarkit programmers
