@@ -13,7 +13,7 @@ let cmarkit =
   let exits = Exit.exits_with_err_diff in
   let man = [
     `S Manpage.s_description;
-    `P "$(mname) process CommonMark files";
+    `P "$(mname) processes CommonMark files";
     `Blocks Cli.common_man; ]
   in
   Cmd.group (Cmd.info "cmarkit" ~version:"%%VERSION%%" ~doc ~exits ~man) @@
