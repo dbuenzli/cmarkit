@@ -1,3 +1,6 @@
+v0.3.0 2023-12-12 La Forclaz (VS)
+---------------------------------
+
 - Fix ordered item marker escaping. Thanks to Rafał Gwoździński for
   the report (#11).
   
