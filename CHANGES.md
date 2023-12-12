@@ -1,5 +1,3 @@
-
-
 - Fix ordered item marker escaping. Thanks to Rafał Gwoździński for
   the report (#11).
   
@@ -13,6 +11,10 @@
   We don't want to generate invalid CommonMark by default. Thanks to 
   Rafał Gwoździński for the report (#9).
 
+- Add option `-f/--full-featured`, to `cmarkit html`. A synonym for a
+  bunch of existing options to generate a publishable document with extensions
+  and math rendering without hassle.  See `cmarkit html --help` for details.
+  
 v0.2.0 2023-05-10 La Forclaz (VS)
 ---------------------------------
 
