@@ -99,8 +99,7 @@ val escaped_text : Cmarkit_renderer.context -> string -> unit
        ({{!Cmarkit.ext_strikethrough}strikethrough extension}).}
     {- [&] if followed by an US-ASCII letter or [#].}
     {- [!] if it is the last character of [s].}
-    {- [.] or [)] only if preceeded by a single [1] and zero or more [0] to
-      the start of text.}
+    {- [.] or [)] only if preceeded by at most 9 digits to the start of text.}
     {- Everywhere, [*] [_] [\ ] [<] [>] [\[] [\]],
       {{:https://spec.commonmark.org/0.30/#ascii-control-character}
        ASCII control characters}, [$] ({{!Cmarkit.ext_math_inline}inline math

@@ -1,4 +1,8 @@
 
+
+- Fix ordered item marker escaping. Thanks to Rafał Gwoździński for
+  the report (#11).
+  
 - Data updated for Unicode 15.1.0 (no changes except 
   for the value of `Cmarkit.Doc.unicode_version`).
 
