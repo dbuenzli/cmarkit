@@ -1,5 +1,6 @@
 
-
+- `Cmarkit.Mapper`, do not drop empty table cells. 
+  Thanks to Hannes Mehnert for the report (#14).
 - Fix invalid markup generated for cancelled task items. 
   Thanks to Sebastien Mondet for the report (#15).
 

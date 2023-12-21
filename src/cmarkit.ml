@@ -3074,14 +3074,12 @@ module Mapper = struct
           Some (Paragraph ({ p with inline }, meta))
       | Ext_table (t, meta) ->
           let map_col m (i, layout) = match map_inline m i with
-          | None -> None | Some i -> Some (i, layout)
+          | None -> (Inline.empty, layout) | Some i -> (i, layout)
           in
           let map_row (((r, meta), blanks) as row) = match r with
-          | `Header is ->
-              (`Header (List.filter_map (map_col m) is), meta), blanks
+          | `Header is -> (`Header (List.map (map_col m) is), meta), blanks
           | `Sep _ -> row
-          | `Data is ->
-              (`Data (List.filter_map (map_col m) is), meta), blanks
+          | `Data is -> (`Data (List.map (map_col m) is), meta), blanks
           in
           let rows = List.map map_row t.rows in
           Some (Ext_table ({ t with Table.rows }, meta))

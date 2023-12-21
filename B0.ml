@@ -70,6 +70,13 @@ let bench =
   let meta = B0_meta.(empty |> tag bench) in
   B0_ocaml.exe "bench" ~doc ~meta ~srcs ~requires
 
+let test =
+  let doc = "Other expectation tests" in
+  let srcs = [ `File ~/"test/test.ml" ] in
+  let requires = [cmarkit] in
+  let meta = B0_meta.empty |> B0_meta.tag B0_meta.test in
+  B0_ocaml.exe "test" ~doc ~meta ~srcs ~requires
+
 let test_spec =
   let doc = "Test CommonMark specification conformance tests" in
   let srcs = `File ~/"test/test_spec.ml" :: spec_srcs in
@@ -106,6 +113,14 @@ let examples =
   B0_ocaml.exe "examples" ~doc ~meta ~srcs ~requires
 
 (* Expectation tests *)
+
+let expect_test ctx =
+  let test = (* TODO b0 something more convenient. *)
+    B0_env.unit_cmd (B0_expect.env ctx) test
+    |> B0_expect.result_to_abort
+  in
+  let cwd = B0_env.scope_dir (B0_expect.env ctx) in
+  B0_expect.stdout ctx ~cwd ~stdout:(Fpath.v "test.expect") test
 
 let expect_trip_spec ctx =
   let trip_spec = (* TODO b0 something more convenient. *)
@@ -145,10 +160,11 @@ let expect_cmarkit_renders ctx =
 
 let expect =
   let doc = "Test expectations" in
-  B0_action.make "expect" ~units:[trip_spec; cmarkit_tool] ~doc  @@
+  B0_action.make "expect" ~units:[test; trip_spec; cmarkit_tool] ~doc  @@
   B0_expect.action_func ~base:(Fpath.v "test/expect") @@ fun ctx ->
   expect_cmarkit_renders ctx;
   expect_trip_spec ctx;
+  expect_test ctx;
   ()
 
 (* Packs *)
