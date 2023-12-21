@@ -1,3 +1,8 @@
+
+
+- Fix invalid markup generated for cancelled task items. 
+  Thanks to Sebastien Mondet for the report (#15).
+
 v0.3.0 2023-12-12 La Forclaz (VS)
 ---------------------------------
 

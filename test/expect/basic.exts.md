@@ -92,6 +92,9 @@ But it can also be in $$ \left( \sum_{k=1}^n
   * [x] Task done
   * [~] Task cancelled
         Paragraphy
+  * [~] Task canceled 
+  
+            we have a code block here too.
   * [x]Not a task
   * \[x] Not a task
 

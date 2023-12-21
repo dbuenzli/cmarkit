@@ -112,6 +112,12 @@ Task done
 \item{} \lbrack ~\rbrack \enspace
 Task cancelled
 Paragraphy
+\item{} \lbrack ~\rbrack \enspace
+Task canceled
+
+\begin{verbatim}
+we have a code block here too.
+\end{verbatim}
 \item{}
 [x]Not a task
 \item{}
