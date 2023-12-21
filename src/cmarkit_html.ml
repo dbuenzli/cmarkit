@@ -350,7 +350,7 @@ let list_item ~tight c (i, _) = match Block.List_item.ext_task_marker i with
     | `Cancelled ->
         C.string c
           "<div class=\"task\"><input type=\"checkbox\" disabled><del>";
-        "<del></div></li>\n"
+        "</del></div></li>\n"
     in
     item_block ~tight c (Block.List_item.block i);
     C.string c close
