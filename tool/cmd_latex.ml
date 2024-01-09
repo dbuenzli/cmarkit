@@ -112,9 +112,10 @@ Buffer.add_string (if files <> [] then "\n" else "")
 let latex
     files quiet accumulate_defs strict heading_auto_ids backend_blocks
     lift_headings docu title author inline_preambles keep_built_in_preambles
+    first_heading
   =
   let resolver = Label_resolver.v ~quiet in
-  let r = Cmarkit_latex.renderer ~backend_blocks () in
+  let r = Cmarkit_latex.renderer ~backend_blocks ~first_heading () in
   let parse ~extract_title ~file ~defs md =
     let doc =
       Cmarkit.Doc.of_string ~resolver ~defs ~heading_auto_ids ~file ~strict md
@@ -178,6 +179,20 @@ let lift_headings =
   in
   Arg.(value & flag & info ["l"; "lift-headings"] ~doc)
 
+let first_heading =
+  let doc = "The first heading kind to use."
+  in
+  let parse s =
+    match Cmarkit_latex.heading_of_string s with
+    | None -> Error (`Msg (Format.sprintf "invalid heading kind: %s" s))
+    | Some h -> Ok h
+  in
+  let print = Cmarkit_latex.pp_heading in
+  let c = Arg.conv ~docv:"VALUE" (parse, print) in
+  let v = Cmarkit_latex.Section in
+  let i = Arg.info ["f"; "first-heading"] ~doc in
+  Arg.(value & opt c v i)
+
 let v =
   let doc = "Render CommonMark to LaTeX" in
   let man = [
@@ -193,7 +208,7 @@ let v =
   Term.(const latex $ Cli.files $ Cli.quiet $ Cli.accumulate_defs $ Cli.strict $
         Cli.heading_auto_ids $ backend_blocks $ lift_headings $
         Cli.docu $ Cli.title $ author $ inline_preambles $
-        keep_built_in_preamble)
+        keep_built_in_preamble $ first_heading)
 
 (* Built-in LaTeX preamable, defined that way to avoid source clutter *)
 

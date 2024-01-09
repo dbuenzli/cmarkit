@@ -21,7 +21,18 @@ val of_doc : ?backend_blocks:bool -> Cmarkit.Doc.t -> string
 
 (** {1:renderer Renderer} *)
 
-val renderer : ?backend_blocks:bool -> unit -> Cmarkit_renderer.t
+type heading =
+    | Part
+    | Chapter
+    | Section
+    | Subsection
+(** The type of headings. *)
+
+val heading_of_string : string -> heading option
+
+val pp_heading : Format.formatter -> heading -> unit
+
+val renderer : ?backend_blocks:bool -> ?first_heading:heading -> unit -> Cmarkit_renderer.t
 (** [renderer] is a default L{^A}T{_E}X renderer. This renders
     the strict CommonMark abstract syntax tree and the supported
     Cmarkit {{!Cmarkit.extensions}extensions}.
@@ -35,7 +46,10 @@ val renderer : ?backend_blocks:bool -> unit -> Cmarkit_renderer.t
     {ul
     {- [backend_blocks], if [true], code blocks with language [=latex]
        are written verbatim in the output and any other code block whose
-       langage starts with [=] is dropped. Defaults to [false].}}
+       langage starts with [=] is dropped. Defaults to [false].}
+    {- [first_heading], the first heading kind to use. Defaults to
+       [Section].}
+    }
 
     See {{!Cmarkit_renderer.example}this example} to extend or
     selectively override the renderer. *)

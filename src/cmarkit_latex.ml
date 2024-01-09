@@ -226,6 +226,25 @@ let inline c = function
 
 (* Block rendering *)
 
+type heading =
+  | Part
+  | Chapter
+  | Section
+  | Subsection
+
+let heading_of_string = function
+  | "part" -> Some Part
+  | "chapter" -> Some Chapter
+  | "section" -> Some Section
+  | "subsection" -> Some Subsection
+  | _s -> None
+
+let pp_heading fmt = function
+  | Part -> Format.pp_print_string fmt "part"
+  | Chapter -> Format.pp_print_string fmt "chapter"
+  | Section -> Format.pp_print_string fmt "section"
+  | Subsection -> Format.pp_print_string fmt "subsection"
+
 let block_quote c bq =
   newline c;
   C.string c "\\begin{quote}";
@@ -257,8 +276,17 @@ let code_block c cb =
       end;
       newline c
 
-let heading c h =
-  let cmd = match Block.Heading.level h with
+let heading c h ~first_heading =
+  let offset =
+    match first_heading with
+    | Part -> -2
+    | Chapter -> -1
+    | Section -> 0
+    | Subsection -> 1
+  in
+  let cmd = match Block.Heading.level h + offset with
+  | -1 -> "part{"
+  | 0 -> "chapter{"
   | 1 -> "section{" | 2 -> "subsection{" | 3 -> "subsubsection{"
   | 4 -> "paragraph{" | 5 -> "subparagraph{" | 6 -> "subparagraph{"
   | _ -> "subparagraph{"
@@ -377,11 +405,11 @@ let table c t =
   C.string c "\\end{tabular}";
   newline c; C.string c "\\bigskip"; newline c
 
-let block c = function
+let block c ~first_heading = function
 | Block.Block_quote (bq, _) -> block_quote c bq; true
 | Block.Blocks (bs, _) -> List.iter (C.block c) bs; true
 | Block.Code_block (cb, _) -> code_block c cb; true
-| Block.Heading (h, _) -> heading c h; true
+| Block.Heading (h, _) -> heading c h ~first_heading; true
 | Block.Html_block (html, _) -> html_block c html; true
 | Block.List (l, _) -> list c l; true
 | Block.Paragraph (p, _) -> paragraph c p; true
@@ -399,8 +427,9 @@ let doc c d = C.block c (Doc.block d); true
 
 (* Renderer *)
 
-let renderer ?backend_blocks () =
+let renderer ?backend_blocks ?(first_heading=Section) () =
   let init_context = init_context ?backend_blocks in
+  let block = block ~first_heading in
   Cmarkit_renderer.make ~init_context ~inline ~block ~doc ()
 
 let of_doc ?backend_blocks d =
