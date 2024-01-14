@@ -31,7 +31,7 @@ let cmarkit_tool =
 
 (* Unicode support
 
-   XXX we could do without both an exe and an action, cf. the Unicode libs. *)
+   N.B. we could do without both an exe and an action, cf. the Unicode libs. *)
 
 let unicode_data =
   let srcs = [ `File ~/"support/unicode_data.ml" ] in
@@ -43,10 +43,10 @@ let update_unicode =
   let doc = "Update Unicode character data " in
   B0_action.make' "update_unicode_data" ~units:[unicode_data] ~doc @@
   fun _ env ~args:_ ->
-  let* unicode_data = B0_env.unit_cmd env unicode_data in
+  let* unicode_data = B0_env.unit_exe_file env unicode_data in
   let outf = B0_env.in_scope_dir env ~/"src/cmarkit_data_uchar.ml" in
   let outf = Os.Cmd.out_file ~force:true ~make_path:false outf in
-  Os.Cmd.run ~stdout:outf unicode_data
+  Os.Cmd.run ~stdout:outf (Cmd.path unicode_data)
 
 (* Tests *)
 
@@ -84,7 +84,7 @@ let test_spec =
   let meta =
     B0_meta.empty
     |> B0_meta.tag B0_meta.test
-    |> B0_meta.add B0_unit.exec_cwd `Scope_dir
+    |> B0_meta.add B0_unit.Exec.cwd `Scope_dir
   in
   B0_ocaml.exe "test_spec" ~doc ~meta ~srcs ~requires
 
@@ -95,7 +95,7 @@ let trip_spec =
   let meta =
     B0_meta.empty
     |> B0_meta.tag B0_meta.test
-    |> B0_meta.add B0_unit.exec_cwd `Scope_dir
+    |> B0_meta.add B0_unit.Exec.cwd `Scope_dir
   in
   B0_ocaml.exe "trip_spec" ~doc ~meta ~srcs ~requires
 
@@ -115,26 +115,17 @@ let examples =
 (* Expectation tests *)
 
 let expect_test ctx =
-  let test = (* TODO b0 something more convenient. *)
-    B0_env.unit_cmd (B0_expect.env ctx) test
-    |> B0_expect.result_to_abort
-  in
+  let test = B0_expect.get_unit_exe_file_cmd ctx test in
   let cwd = B0_env.scope_dir (B0_expect.env ctx) in
   B0_expect.stdout ctx ~cwd ~stdout:(Fpath.v "test.expect") test
 
 let expect_trip_spec ctx =
-  let trip_spec = (* TODO b0 something more convenient. *)
-    B0_env.unit_cmd (B0_expect.env ctx) trip_spec
-    |> B0_expect.result_to_abort
-  in
+  let trip_spec = B0_expect.get_unit_exe_file_cmd ctx trip_spec in
   let cwd = B0_env.scope_dir (B0_expect.env ctx) in
   B0_expect.stdout ctx ~cwd ~stdout:(Fpath.v "spec.trip") trip_spec
 
 let expect_cmarkit_renders ctx =
-  let cmarkit = (* TODO b0 something more convenient. *)
-    B0_env.unit_cmd (B0_expect.env ctx) cmarkit_tool
-    |> B0_expect.result_to_abort
-  in
+  let cmarkit = B0_expect.get_unit_exe_file_cmd ctx cmarkit_tool in
   let renderers = (* command, output suffix *)
     [ Cmd.(arg "html" % "-c" % "--unsafe"), ".html";
       Cmd.(arg "latex"), ".latex";
