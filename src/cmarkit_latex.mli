@@ -15,24 +15,24 @@
 
 (** {1:rendering Rendering} *)
 
-val of_doc : ?backend_blocks:bool -> Cmarkit.Doc.t -> string
+type heading_level =
+| Part
+| Chapter
+| Section
+| Subsection (** *)
+(** The type for main L{^A}T{_E}X headings levels. *)
+
+val of_doc :
+  ?backend_blocks:bool -> ?first_heading_level:heading_level ->
+  Cmarkit.Doc.t -> string
 (** [of_doc d] is a L{^A}T{_E}X fragment for [d]. See {!val-renderer}
     for more details and documentation about rendering options. *)
 
 (** {1:renderer Renderer} *)
 
-type heading =
-    | Part
-    | Chapter
-    | Section
-    | Subsection
-(** The type of headings. *)
-
-val heading_of_string : string -> heading option
-
-val pp_heading : Format.formatter -> heading -> unit
-
-val renderer : ?backend_blocks:bool -> ?first_heading:heading -> unit -> Cmarkit_renderer.t
+val renderer :
+  ?backend_blocks:bool -> ?first_heading_level:heading_level -> unit ->
+  Cmarkit_renderer.t
 (** [renderer] is a default L{^A}T{_E}X renderer. This renders
     the strict CommonMark abstract syntax tree and the supported
     Cmarkit {{!Cmarkit.extensions}extensions}.
@@ -47,9 +47,8 @@ val renderer : ?backend_blocks:bool -> ?first_heading:heading -> unit -> Cmarkit
     {- [backend_blocks], if [true], code blocks with language [=latex]
        are written verbatim in the output and any other code block whose
        langage starts with [=] is dropped. Defaults to [false].}
-    {- [first_heading], the first heading kind to use. Defaults to
-       [Section].}
-    }
+    {- [first_heading_level], the L{^A}T{_E}X heading level to use
+       for the first CommonMark heading level. Defaults to [Section].}}
 
     See {{!Cmarkit_renderer.example}this example} to extend or
     selectively override the renderer. *)

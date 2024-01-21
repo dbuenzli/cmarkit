@@ -1,6 +1,12 @@
 
+- `Cmarkit_latex`. Add option `?first_heading_level` to the renderer
+  to set the LaTeX heading level to use for the first CommonMark
+  heading level. A corresponding option `--first-heading-level` is
+  added to `cmarkit latex`.  Thanks to Léo Andrès for the patch (#16).
+
 - `Cmarkit.Mapper`, do not drop empty table cells. 
   Thanks to Hannes Mehnert for the report (#14).
+
 - Fix invalid markup generated for cancelled task items. 
   Thanks to Sebastien Mondet for the report (#15).
 

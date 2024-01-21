@@ -9,8 +9,15 @@ module String_set = Set.Make (String)
 
 (* State *)
 
+type heading_level =
+| Part
+| Chapter
+| Section
+| Subsection
+
 type state =
   { backend_blocks : bool;
+    first_heading_level : heading_level;
     mutable sot : bool; (* start of text *)
     mutable labels : String_set.t;
     mutable footnote_labels : string Label.Map.t; }
@@ -18,9 +25,14 @@ type state =
 let state : state C.State.t = C.State.make ()
 let get_state c = C.State.get c state
 let backend_blocks c = (get_state c).backend_blocks
-let init_context ?(backend_blocks = false) c _ =
+let first_heading_level c = (get_state c).first_heading_level
+let init_context
+    ?(backend_blocks = false) ?(first_heading_level = Section) c _
+  =
   let labels = String_set.empty and footnote_labels = Label.Map.empty in
-  let st = { backend_blocks; sot = true; labels; footnote_labels } in
+  let st =
+    { backend_blocks; first_heading_level; sot = true; labels; footnote_labels }
+  in
   C.State.set c state (Some st)
 
 let unique_label c l =
@@ -276,20 +288,14 @@ let code_block c cb =
       end;
       newline c
 
-let heading c h ~first_heading =
-  let offset =
-    match first_heading with
-    | Part -> -2
-    | Chapter -> -1
-    | Section -> 0
-    | Subsection -> 1
+let heading c h =
+  let first = match first_heading_level c with
+  | Part -> 0 | Chapter -> 1 | Section -> 2 | Subsection -> 3
   in
-  let cmd = match Block.Heading.level h + offset with
-  | -1 -> "part{"
-  | 0 -> "chapter{"
-  | 1 -> "section{" | 2 -> "subsection{" | 3 -> "subsubsection{"
-  | 4 -> "paragraph{" | 5 -> "subparagraph{" | 6 -> "subparagraph{"
-  | _ -> "subparagraph{"
+  let cmd = match first + Block.Heading.level h with
+  | 1 -> "part{" | 2 -> "chapter{" | 3 -> "section{" | 4 -> "subsection{"
+  | 5 -> "subsubsection{" | 6 -> "paragraph{" | 7 -> "subparagraph{"
+  | 8 -> "subparagraph{" | _ -> "subparagraph{"
   in
   let i = Block.Heading.inline h in
   newline c;
@@ -405,11 +411,11 @@ let table c t =
   C.string c "\\end{tabular}";
   newline c; C.string c "\\bigskip"; newline c
 
-let block c ~first_heading = function
+let block c = function
 | Block.Block_quote (bq, _) -> block_quote c bq; true
 | Block.Blocks (bs, _) -> List.iter (C.block c) bs; true
 | Block.Code_block (cb, _) -> code_block c cb; true
-| Block.Heading (h, _) -> heading c h ~first_heading; true
+| Block.Heading (h, _) -> heading c h; true
 | Block.Html_block (html, _) -> html_block c html; true
 | Block.List (l, _) -> list c l; true
 | Block.Paragraph (p, _) -> paragraph c p; true
@@ -427,10 +433,10 @@ let doc c d = C.block c (Doc.block d); true
 
 (* Renderer *)
 
-let renderer ?backend_blocks ?(first_heading=Section) () =
-  let init_context = init_context ?backend_blocks in
-  let block = block ~first_heading in
+let renderer ?backend_blocks ?first_heading_level () =
+  let init_context = init_context ?backend_blocks ?first_heading_level in
   Cmarkit_renderer.make ~init_context ~inline ~block ~doc ()
 
-let of_doc ?backend_blocks d =
-  Cmarkit_renderer.doc_to_string (renderer ?backend_blocks ()) d
+let of_doc ?backend_blocks ?first_heading_level d =
+  Cmarkit_renderer.doc_to_string
+    (renderer ?backend_blocks ?first_heading_level ()) d
