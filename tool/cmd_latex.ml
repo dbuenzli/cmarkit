@@ -180,16 +180,16 @@ let lift_headings =
   Arg.(value & flag & info ["l"; "lift-headings"] ~doc)
 
 let first_level_heading =
-  let cmd_enum =
+  let level_enum =
     [ "part", Cmarkit_latex.Part; "chapter", Chapter;
       "section", Section; "subsection", Subsection ]
   in
   let doc =
     Printf.sprintf
       "Use LaTeX heading level $(docv) for the first CommonMark heading level. \
-       $(docv) must be %s." (Arg.doc_alts_enum cmd_enum)
+       $(docv) must be %s." (Arg.doc_alts_enum level_enum)
   in
-  Arg.(value & opt (Arg.enum cmd_enum) Cmarkit_latex.Section &
+  Arg.(value & opt (Arg.enum level_enum) Cmarkit_latex.Section &
        Arg.info ["first-heading-level"] ~doc ~docv:"LEVEL")
 
 let v =
