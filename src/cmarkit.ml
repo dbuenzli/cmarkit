@@ -1957,7 +1957,8 @@ module Block_struct = struct
 
   let accept_cols ~count p =
     let rec loop p count k col =
-      if count = 0 then (p.current_char <- k; p.current_char_col <- col) else
+      if count = 0 || k > p.current_line_last_char
+      then (p.current_char <- k; p.current_char_col <- col) else
       if p.i.[k] <> '\t' then loop p (count - 1) (k + 1) (col + 1) else
       let col' = next_tab_stop col in
       let tab_cols = col' - (col + p.tab_consumed_cols) in

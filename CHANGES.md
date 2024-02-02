@@ -7,6 +7,9 @@
 - `Cmarkit.Mapper`, do not drop empty table cells. 
   Thanks to Hannes Mehnert for the report (#14).
 
+- Fix crash (out of bounds exception) when lists are terminated by
+  the end of file. Thanks to Ty Overby for the report (#18).
+
 - Fix invalid markup generated for cancelled task items. 
   Thanks to Sebastien Mondet for the report (#15).
 
