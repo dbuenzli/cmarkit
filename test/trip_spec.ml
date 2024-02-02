@@ -69,6 +69,7 @@ let notrip_reasons =
     290, unlazy (* and indented_blanks *);
     291, unlazy; 292, unlazy; 293, unlazy;
     (* Lists *)
+    304, eager_escape;
     306, indented_blanks; 307, indented_blanks; 309, indented_blanks;
     311, indented_blanks; 312, indented_blanks; 313, indented_blanks;
     314, indented_blanks; 315, empty_item; 316, indented_blanks;

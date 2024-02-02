@@ -1,13 +1,3 @@
-[ OK ] https://spec.commonmark.org/0.30/#example-304
-diff --git a/spec b/cmarkit
-index bf99ee1..7685638 100644
---- a/spec
-+++ b/cmarkit
-@@ -1,2 +1,2 @@
- The number of windows in my house is
--14.  The number of doors is 6.
-+14\.  The number of doors is 6.
-
 [ OK ] 274 out of 652 are correct.
 [TRIP] 378 out of 652 round trip.
 [ OK ] All 652 on parse without layout.
