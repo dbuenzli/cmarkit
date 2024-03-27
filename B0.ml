@@ -11,6 +11,7 @@ let commonmark_version =
 let cmarkit = B0_ocaml.libname "cmarkit"
 let cmdliner = B0_ocaml.libname "cmdliner"
 let uucp = B0_ocaml.libname "uucp"
+let unix = B0_ocaml.libname "unix"
 
 let b0_std = B0_ocaml.libname "b0.std"
 let b0_file = B0_ocaml.libname "b0.file"
@@ -102,7 +103,7 @@ let trip_spec =
 let pathological =
   let doc = "Test a CommonMark parser on pathological tests." in
   let srcs = [ `File ~/"test/pathological.ml" ] in
-  let requires = [ b0_std ] in
+  let requires = [ b0_std; unix ] in
   B0_ocaml.exe "pathological" ~doc ~srcs ~requires
 
 let examples =
