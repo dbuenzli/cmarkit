@@ -13,7 +13,7 @@ let status ~pass ex_num =
     Fmt.pf ppf "https://spec.commonmark.org/%s/#example-%d" Spec.version n
   in
   let pp, st = if pass then Spec.ok, "PASS" else Spec.fail, "FAIL" in
-  m "[%a] %a" pp st Fmt.(code pp_ex) ex_num
+  m "[%a] %a" pp st Fmt.(code' pp_ex) ex_num
 
 let renderer =
   (* Specification tests render empty elements as XHTML. *)

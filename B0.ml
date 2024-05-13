@@ -85,6 +85,7 @@ let test_spec =
   let meta =
     B0_meta.empty
     |> B0_meta.tag B0_meta.test
+    |> B0_meta.tag B0_meta.run
     |> B0_meta.add B0_unit.Exec.cwd `Scope_dir
   in
   B0_ocaml.exe "test_spec" ~doc ~meta ~srcs ~requires
@@ -96,6 +97,7 @@ let trip_spec =
   let meta =
     B0_meta.empty
     |> B0_meta.tag B0_meta.test
+    |> B0_meta.tag B0_meta.run
     |> B0_meta.add B0_unit.Exec.cwd `Scope_dir
   in
   B0_ocaml.exe "trip_spec" ~doc ~meta ~srcs ~requires

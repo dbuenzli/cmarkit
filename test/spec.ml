@@ -54,8 +54,8 @@ let diff ~spec cmarkit =
   Result.map snd @@
   Os.Cmd.run_status_out ~env ~trim ~cwd:dir Cmd.(diff % "spec" % "cmarkit")
 
-let ok = Fmt.tty' [`Fg `Green]
-let fail = Fmt.tty' [`Fg `Red]
+let ok = Fmt.tty [`Fg `Green]
+let fail = Fmt.tty [`Fg `Red]
 
 let cli ~exe () =
   let usage = Fmt.str "Usage %s [--file FILE.json] NUM[-NUM]…" exe in

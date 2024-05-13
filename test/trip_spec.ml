@@ -141,7 +141,7 @@ let status st ex_num =
   | `Ok -> Spec.ok, " OK "
   | `Fail -> Spec.fail, "FAIL"
   in
-  m "[%a] %a" pp_st st Fmt.(code pp_ex) ex_num
+  m "[%a] %a" pp_st st Fmt.(code' pp_ex) ex_num
 
 let renderer =
   (* Specification tests render empty elements as XHTML. *)

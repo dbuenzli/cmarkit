@@ -125,8 +125,8 @@ let deadline_run ~timeout ?env ?cwd ?stdin ?stdout ?stderr cmd =
 
 type test_exit = [ deadline_exit | `Unexpected of string * string ]
 
-let pp_ok = Fmt.tty' [`Fg `Green]
-let pp_err = Fmt.tty' [`Fg `Red]
+let pp_ok = Fmt.tty [`Fg `Green]
+let pp_err = Fmt.tty [`Fg `Red]
 let pp_test_exit ppf = function
 | `Exited 0 -> Fmt.pf ppf "%a" pp_ok "ok"
 | `Exited n -> Fmt.pf ppf "%a with %d" pp_err "exited" n
