@@ -154,7 +154,8 @@ let expect_cmarkit_renders ctx =
 
 let expect =
   let doc = "Test expectations" in
-  B0_action.make "expect" ~units:[test; trip_spec; cmarkit_tool] ~doc  @@
+  let meta = B0_meta.(empty |> tag test |> tag run) in
+  B0_action.make "expect" ~meta ~units:[test; trip_spec; cmarkit_tool] ~doc  @@
   B0_expect.action_func ~base:(Fpath.v "test/expect") @@ fun ctx ->
   expect_cmarkit_renders ctx;
   expect_trip_spec ctx;
