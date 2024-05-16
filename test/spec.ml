@@ -37,7 +37,7 @@ let parse_tests file =
 let diff ~spec cmarkit =
   let retract_result = function Ok s | Error s -> s in
   retract_result @@
-  let color = match Fmt.tty_cap () with
+  let color = match Fmt.styler () with
   | `None -> "--color=never"
   | `Ansi -> "--color=always"
   in
@@ -54,8 +54,8 @@ let diff ~spec cmarkit =
   Result.map snd @@
   Os.Cmd.run_status_out ~env ~trim ~cwd:dir Cmd.(diff % "spec" % "cmarkit")
 
-let ok = Fmt.tty [`Fg `Green]
-let fail = Fmt.tty [`Fg `Red]
+let ok = Fmt.st [`Fg `Green]
+let fail = Fmt.st [`Fg `Red]
 
 let cli ~exe () =
   let usage = Fmt.str "Usage %s [--file FILE.json] NUM[-NUM]…" exe in

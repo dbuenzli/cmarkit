@@ -42,8 +42,8 @@ let unicode_data =
 
 let update_unicode =
   let doc = "Update Unicode character data " in
-  B0_action.make' "update_unicode_data" ~units:[unicode_data] ~doc @@
-  fun _ env ~args:_ ->
+  B0_unit.of_action "update_unicode_data" ~units:[unicode_data] ~doc @@
+  fun env _ ~args:_ ->
   let* unicode_data = B0_env.unit_exe_file env unicode_data in
   let outf = B0_env.in_scope_dir env ~/"src/cmarkit_data_uchar.ml" in
   let outf = Os.Cmd.out_file ~force:true ~make_path:false outf in
@@ -52,8 +52,9 @@ let update_unicode =
 (* Tests *)
 
 let update_spec_tests =
-  B0_action.make' "update_spec_tests" ~doc:"Update the CommonMark spec tests" @@
-  fun _ env ~args:_ ->
+  let doc = "Update the CommonMark spec tests" in
+  B0_unit.of_action "update_spec_tests" ~doc @@
+  fun env _ ~args:_ ->
   let tests =
     Fmt.str "https://spec.commonmark.org/%s/spec.json" commonmark_version
   in
@@ -86,7 +87,7 @@ let test_spec =
     B0_meta.empty
     |> B0_meta.tag B0_meta.test
     |> B0_meta.tag B0_meta.run
-    |> B0_meta.add B0_unit.Exec.cwd `Scope_dir
+    |> B0_meta.add B0_unit.Action.cwd `Scope_dir
   in
   B0_ocaml.exe "test_spec" ~doc ~meta ~srcs ~requires
 
@@ -98,7 +99,7 @@ let trip_spec =
     B0_meta.empty
     |> B0_meta.tag B0_meta.test
     |> B0_meta.tag B0_meta.run
-    |> B0_meta.add B0_unit.Exec.cwd `Scope_dir
+    |> B0_meta.add B0_unit.Action.cwd `Scope_dir
   in
   B0_ocaml.exe "trip_spec" ~doc ~meta ~srcs ~requires
 
@@ -155,7 +156,8 @@ let expect_cmarkit_renders ctx =
 let expect =
   let doc = "Test expectations" in
   let meta = B0_meta.(empty |> tag test |> tag run) in
-  B0_action.make "expect" ~meta ~units:[test; trip_spec; cmarkit_tool] ~doc  @@
+  let units = [test; trip_spec; cmarkit_tool] in
+  B0_unit.of_action' "expect" ~meta ~units ~doc @@
   B0_expect.action_func ~base:(Fpath.v "test/expect") @@ fun ctx ->
   expect_cmarkit_renders ctx;
   expect_trip_spec ctx;
