@@ -36,7 +36,7 @@ let cmarkit_tool =
 
 let unicode_data =
   let srcs = [ `File ~/"support/unicode_data.ml" ] in
-  let requires = [uucp] in
+  let requires = [uucp; unix] in
   let doc = "Generate cmarkit Unicode data" in
   B0_ocaml.exe "unicode_data" ~doc ~srcs ~requires
 
