@@ -13,6 +13,8 @@
 - Fix invalid markup generated for cancelled task items. 
   Thanks to Sebastien Mondet for the report (#15).
 
+- Updated data for Unicode 16.0.0.
+
 v0.3.0 2023-12-12 La Forclaz (VS)
 ---------------------------------
 
