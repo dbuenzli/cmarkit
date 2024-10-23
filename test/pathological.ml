@@ -171,9 +171,9 @@ let run_tests ~timeout cmd =
   Log.if_error ~use:2 @@
   let* cmd = Os.Cmd.get cmd in
   let init = Mtime.Span.zero, 0, 1 in
-  Log.app (fun m -> m "%a" pp_tests_params (timeout, cmd));
+  Log.stdout (fun m -> m "%a" pp_tests_params (timeout, cmd));
   let* dur, fail, i = List.fold_stop_on_error do_test tests init in
-  Log.app (fun m -> m "%a" pp_tests_summary (i - 1, fail, dur));
+  Log.stdout (fun m -> m "%a" pp_tests_summary (i - 1, fail, dur));
   Ok (Int.min fail 1)
 
 let dump_tests dir =

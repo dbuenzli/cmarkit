@@ -8,7 +8,7 @@ open Result.Syntax
 open B0_json
 
 let status ~pass ex_num =
-  Log.app @@ fun m ->
+  Log.stdout @@ fun m ->
   let pp_ex ppf n =
     Fmt.pf ppf "https://spec.commonmark.org/%s/#example-%d" Spec.version n
   in
@@ -25,14 +25,14 @@ let test (t : Spec.test) =
   if String.equal html t.html then Ok ((* status ~pass:true t.example *)) else
   let diff = String.concat "\n" [t.markdown; Spec.diff ~spec:t.html html] in
   status ~pass:false t.example;
-  Log.app (fun m -> m "%s" diff);
+  Log.stdout (fun m -> m "%s" diff);
   Error ()
 
 let run_tests test_file examples (* empty is all *) =
-  let log_ok n = Log.app @@ fun m ->
+  let log_ok n = Log.stdout @@ fun m ->
     m "[ %a ] All %d tests succeeded." Spec.ok "OK" n
   in
-  let log_fail n f = Log.app @@ fun m ->
+  let log_fail n f = Log.stdout @@ fun m ->
     m "[%a] %d out of %d tests failed." Spec.fail "FAIL" f n
   in
   Log.if_error ~use:1 @@
