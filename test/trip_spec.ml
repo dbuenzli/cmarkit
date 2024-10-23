@@ -132,7 +132,7 @@ let notrip_reasons =
   ]
 
 let status st ex_num =
-  Log.app @@ fun m ->
+  Log.stdout @@ fun m ->
   let pp_ex ppf n =
     Fmt.pf ppf "https://spec.commonmark.org/%s/#example-%d" Spec.version n
   in
@@ -172,7 +172,7 @@ let test (t : Spec.test) ~show_diff =
       if show_diff || not has_notrip_reason then begin
         let diff = Spec.diff ~spec:t.markdown md in
         status `Ok t.example;
-        Log.app (fun m -> m "@[<v>%a%s@]" pp_reason () diff)
+        Log.stdout (fun m -> m "@[<v>%a%s@]" pp_reason () diff)
       end;
       `Ok
   | false ->
@@ -183,7 +183,7 @@ let test (t : Spec.test) ~show_diff =
       if has_notrip_reason then begin
         Log.warn (fun m -> m "Example fails but should be correct.")
       end;
-      Log.app (fun m -> m "@[<v>%a%s@]" pp_reason () diff); `Fail
+      Log.stdout (fun m -> m "@[<v>%a%s@]" pp_reason () diff); `Fail
 
 let test_no_layout (t : Spec.test) =
   (* Parse without layout, render commonmark, reparse, render to HTML *)
@@ -197,27 +197,28 @@ let test_no_layout (t : Spec.test) =
   let d = [t.markdown; "Markdown render:"; md_diff; "HTML render:"; html_diff]in
   let diff = String.concat "\n" d in
   status `Fail t.example;
-  Log.app (fun m -> m "@[<v>Parse without layout render:@,%s@]" diff);
+  Log.stdout (fun m -> m "@[<v>Parse without layout render:@,%s@]" diff);
   Error ()
 
 let log_result n valid fail no_layout_fail =
   let trip = n - valid - fail in
   if fail <> 0 then
-    (Log.app @@ fun m -> m "[%a] %d out of %d fail." Spec.fail "FAIL" fail n);
+    (Log.stdout
+     @@ fun m -> m "[%a] %d out of %d fail." Spec.fail "FAIL" fail n);
   if valid <> 0 then
-    (Log.app @@ fun m ->
+    (Log.stdout @@ fun m ->
      m "[%a] %d out of %d are correct."
        Spec.ok " OK " valid n);
   if trip <> 0 then
-    (Log.app @@ fun m ->
+    (Log.stdout @@ fun m ->
      let count = if n = trip then "All" else Fmt.str "%d out of" trip in
      m "[%a] %s %d round trip." Spec.ok "TRIP" count n);
-  Log.app @@ fun m ->
+  Log.stdout @@ fun m ->
   let count, pp, st = match no_layout_fail with
   | 0 -> "All", Spec.ok, " OK "
   | f -> Fmt.str "%d out of" f, Spec.fail, "FAIL"
   in
-  Log.app @@ fun m ->
+  Log.stdout @@ fun m ->
   m "[%a] %s %d on parse without layout." pp st count n
 
 let run_tests test_file examples show_diff =
