@@ -204,7 +204,6 @@ let main () =
       "--", Arg.Rest add_arg, "TOOL ARG…  Executable to test."; ]
   in
   Arg.parse args add_arg usage;
-  Fmt.set_tty_cap ();
   match !dump_dir with
   | Some dir -> dump_tests dir
   | None ->

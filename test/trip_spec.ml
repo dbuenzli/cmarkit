@@ -241,7 +241,6 @@ let run_tests test_file examples show_diff =
 
 let main () =
   let show_diff, file, examples = Spec.cli ~exe:"trip_spec" () in
-  Fmt.set_tty_cap ();
   run_tests file examples show_diff
 
 let () = if !Sys.interactive then () else exit (main ())

@@ -38,8 +38,8 @@ let diff ~spec cmarkit =
   let retract_result = function Ok s | Error s -> s in
   retract_result @@
   let color = match Fmt.styler () with
-  | `None -> "--color=never"
-  | `Ansi -> "--color=always"
+  | Fmt.Plain -> "--color=never"
+  | Fmt.Ansi -> "--color=always"
   in
   let* diff =
     Os.Cmd.get Cmd.(arg "git" % "diff" % "--ws-error-highlight=all" %

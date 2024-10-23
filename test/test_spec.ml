@@ -49,7 +49,6 @@ let run_tests test_file examples (* empty is all *) =
 
 let main () =
   let _, file, examples = Spec.cli ~exe:"test_spec" () in
-  Fmt.set_tty_cap ();
   run_tests file examples
 
 let () = if !Sys.interactive then () else exit (main ())
