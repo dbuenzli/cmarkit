@@ -30,7 +30,7 @@ homepage: "https://erratique.ch/software/cmarkit"
 doc: "https://erratique.ch/software/cmarkit/doc"
 bug-reports: "https://github.com/dbuenzli/cmarkit/issues"
 depends: [
-  "ocaml" {>= "4.14.0"}
+  "ocaml" {>= "4.08.0"}
   "ocamlfind" {build}
   "ocamlbuild" {build}
   "topkg" {build & >= "1.0.3"}
