@@ -193,6 +193,13 @@ let default =
         "uucp", {|dev|};
         "b0", {|dev & with-test|};
       ]
+    |> ~~ B0_opam.install
+      {|[[ "cmdliner" "install" "tool-support"
+           "--mandir=%{man}%"
+           "--sharedir=%{share}%"
+           "_build/src/tool/cmarkit_main.native:cmarkit" {ocaml:native}
+           "_build/src/tool/cmarkit_main.byte:cmarkit" {!ocaml:native}
+           "%{prefix}%"]]|}
   in
   B0_pack.make "default" ~doc:"cmarkit package" ~meta ~locked:true @@
   B0_unit.list ()

@@ -3,7 +3,7 @@
    SPDX-License-Identifier: ISC
   ---------------------------------------------------------------------------*)
 
-open Std
+open Cmarkit_std
 open Cmarkit
 
 let strf = Printf.sprintf
@@ -237,25 +237,28 @@ and block ~indent:n ppf = function
 
 let doc_locs ppf doc = block ~indent:0 ppf (Doc.block doc)
 
-let locs files strict no_layout =
+let locs ~files ~strict ~no_layout =
   let locs ~file contents =
     let locs = true and layout = not no_layout in
     let doc = Cmarkit.Doc.of_string ~file ~locs ~layout ~strict contents in
     doc_locs Format.std_formatter doc
   in
-  Std.process_files locs files
+  Cmarkit_cli.process_files locs files
 
 (* Command line interface *)
 
 open Cmdliner
+open Cmdliner.Term.Syntax
 
-let v =
+let cmd =
   let doc = "Show CommonMark parse locations" in
-  let exits = Exit.exits in
+  let exits = Cmarkit_cli.Exit.exits in
   let man = [
     `S Manpage.s_description;
     `P "$(tname) outputs CommonMark parse locations.";
-    `Blocks Cli.common_man; ]
+    `Blocks Cmarkit_cli.common_man; ]
   in
-  Cmd.v (Cmd.info "locs" ~doc ~exits ~man) @@
-  Term.(const locs $ Cli.files $ Cli.strict $ Cli.no_layout)
+  Cmd.make (Cmd.info "locs" ~doc ~exits ~man) @@
+  let+ files = Cmarkit_cli.files and+ strict = Cmarkit_cli.strict
+  and+ no_layout = Cmarkit_cli.no_layout in
+  locs ~files ~strict ~no_layout

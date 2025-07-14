@@ -3,7 +3,7 @@
    SPDX-License-Identifier: ISC
   ---------------------------------------------------------------------------*)
 
-open Std
+open Cmarkit_std
 open Result.Syntax
 
 let diff src render =
@@ -21,7 +21,7 @@ let diff src render =
   let* () = Os.write_file render_file render in
   Ok (Sys.command cmd)
 
-let commonmark files strict no_layout dodiff html_diff =
+let commonmark ~files ~strict ~no_layout ~diff:dodiff ~html_diff =
   let op = match html_diff, dodiff with
   | true, _ -> `Html_diff | false, true -> `Diff | false, false -> `Render
   in
@@ -33,16 +33,16 @@ let commonmark files strict no_layout dodiff html_diff =
   match op with
   | `Render ->
       let output_cmark ~file src = print_string (commonmark ~file src) in
-      Std.process_files output_cmark files
+      Cmarkit_cli.process_files output_cmark files
   | `Diff ->
       let trips = ref [] in
       let add ~file src = trips := (src, commonmark ~file src) :: !trips in
-      let c = Std.process_files add files in
+      let c = Cmarkit_cli.process_files add files in
       if c <> 0 then c else
       let src = String.concat "\n" (List.rev_map fst !trips) in
       let outs = String.concat "\n" (List.rev_map snd !trips) in
       (match diff src outs with
-      | Ok exit -> if exit = 0 then 0 else Exit.err_diff
+      | Ok exit -> if exit = 0 then 0 else Cmarkit_cli.Exit.err_diff
       | Error err -> Log.err "%s" err; Cmdliner.Cmd.Exit.some_error)
   | `Html_diff ->
       let htmls = ref [] in
@@ -54,44 +54,46 @@ let commonmark files strict no_layout dodiff html_diff =
         let doc_html' = Cmarkit_html.of_doc ~safe:false doc' in
         htmls := (doc_html, doc_html') :: !htmls
       in
-      let c = Std.process_files add files in
+      let c = Cmarkit_cli.process_files add files in
       if c <> 0 then c else
       let html = String.concat "\n" (List.rev_map fst !htmls) in
       let html' = String.concat "\n" (List.rev_map snd !htmls) in
       match diff html html' with
-      | Ok exit -> if exit = 0 then 0 else Exit.err_diff
+      | Ok exit -> if exit = 0 then 0 else Cmarkit_cli.Exit.err_diff
       | Error err -> Log.err "%s" err; Cmdliner.Cmd.Exit.some_error
 
 (* Command line interface *)
 
 open Cmdliner
+open Cmdliner.Term.Syntax
 
 let diff =
-  let doc = "Output difference between the source and its CommonMark \
-             rendering (needs $(b,git) in your $(b,PATH)). If there are \
-             differences check that the HTML renderings do not differ with \
-             option $(b,--html-diff)."
+  let doc =
+    "Output difference between the source and its CommonMark rendering \
+     (needs $(b,git) in your $(b,PATH)). If there are differences check \
+     that the HTML renderings do not differ with option $(b,--html-diff)."
   in
   Arg.(value & flag & info ["diff"] ~doc)
 
 let html_diff =
-  let doc = "Output difference between the source HTML rendering \
-             and the HTML rendering of its CommonMark rendering \
-             (needs $(b,git) in your $(b,PATH)). If there are no \
-             differences the CommonMark rendering is said to be correct."
+  let doc =
+    "Output difference between the source HTML rendering and the HTML \
+     rendering of its CommonMark rendering (needs $(b,git) in your \
+     $(b,PATH)). If there are no differences the CommonMark rendering \
+     is said to be correct."
   in
   Arg.(value & flag & info ["html-diff"] ~doc)
 
-let v =
+let cmd =
   let doc = "Render CommonMark to CommonMark" in
-  let exits = Exit.exits_with_err_diff in
+  let exits = Cmarkit_cli.Exit.exits_with_err_diff in
   let man = [
     `S Manpage.s_description;
-    `P "$(tname) outputs a CommonMark document. Multiple input
-        files are concatenated and separated by a newline.";
-    `Pre "$(mname) $(tname) $(b,README.md > README-trip.md)"; `Noblank;
-    `Pre "$(mname) $(tname) $(b,--diff README.md)"; `Noblank;
-    `Pre "$(mname) $(tname) $(b,--html-diff README.md)";
+    `P "$(cmd) outputs a CommonMark document. Multiple input files are \
+        concatenated and separated by a newline.";
+    `Pre "$(cmd) $(b,README.md > README-trip.md)"; `Noblank;
+    `Pre "$(cmd) $(b,--diff README.md)"; `Noblank;
+    `Pre "$(cmd) $(b,--html-diff README.md)";
     `P "Layout is preserved on a best-effort basis. Some things are not \
         attempted like preserving entities and character references, \
         preserving the exact line by line indentation layout of container \
@@ -100,8 +102,9 @@ let v =
         except for the first one.";
     `P "Consult the documentation of the $(b,cmarkit) OCaml library for \
         more details about the limitations.";
-    `Blocks Cli.common_man; ]
+    `Blocks Cmarkit_cli.common_man; ]
   in
-  Cmd.v (Cmd.info "commonmark" ~doc ~exits ~man) @@
-  Term.(const commonmark $ Cli.files $ Cli.strict $ Cli.no_layout $
-        diff $ html_diff)
+  Cmd.make (Cmd.info "commonmark" ~doc ~exits ~man) @@
+  let+ files = Cmarkit_cli.files and+ strict = Cmarkit_cli.strict
+  and+ no_layout = Cmarkit_cli.no_layout and+ diff and+ html_diff in
+  commonmark ~files ~strict ~no_layout ~diff ~html_diff

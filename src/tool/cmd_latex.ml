@@ -3,7 +3,7 @@
    SPDX-License-Identifier: ISC
   ---------------------------------------------------------------------------*)
 
-open Std
+open Cmarkit_std
 open Cmarkit
 
 let built_in_preamble = ref "" (* See at the end of the module *)
@@ -74,10 +74,10 @@ let title_of_file f =
 
 let doc
     ~accumulate_defs ~extract_title parse r ~author ~title ~inline_preambles
-    ~keep_built_in_preambles files
+    ~keep_built_in_preamble files
   =
   let built_in_preamble =
-    if inline_preambles = [] || keep_built_in_preambles
+    if inline_preambles = [] || keep_built_in_preamble
     then Some (!built_in_preamble) else None
   in
   let file, files = List.hd files, List.tl files in
@@ -110,9 +110,9 @@ Buffer.add_string (if files <> [] then "\n" else "")
 (buffer_add_docs ~defs ~accumulate_defs parse r) files
 
 let latex
-    files quiet accumulate_defs strict heading_auto_ids backend_blocks
-    lift_headings docu title author inline_preambles keep_built_in_preambles
-    first_heading_level
+    ~files ~quiet ~accumulate_defs ~strict ~heading_auto_ids ~backend_blocks
+    ~lift_headings ~docu ~title ~author ~inline_preambles
+    ~keep_built_in_preamble ~first_heading_level
   =
   let resolver = Label_resolver.v ~quiet in
   let r = Cmarkit_latex.renderer ~backend_blocks ~first_heading_level () in
@@ -127,59 +127,63 @@ let latex
     let s = match docu with
     | true ->
         doc ~accumulate_defs ~extract_title:lift_headings parse
-          ~author ~title ~inline_preambles ~keep_built_in_preambles r files
+          ~author ~title ~inline_preambles ~keep_built_in_preamble r files
     | false ->
         Printf.kbprintf Buffer.contents (Buffer.create 2048) "%a"
           (buffer_add_docs ~accumulate_defs parse r) files;
     in
     print_string s; 0
   with
-  | Failure err -> Log.err "%s" err; Exit.err_file
+  | Failure err -> Log.err "%s" err; Cmarkit_cli.Exit.err_file
 
 (* Command line interface *)
 
 open Cmdliner
+open Cmdliner.Term.Syntax
 
 let author =
-  let doc = "Document author when $(b,--doc) is used. $(docv) is interpreted \
-             as raw LaTeX."
+  let doc =
+    "Document author when $(b,--doc) is used. $(docv) is interpreted as \
+     raw LaTeX."
   in
   Arg.(value & opt (some string) None & info ["a"; "author"] ~doc ~docv:"NAME")
 
 let backend_blocks =
-  let doc = "Code blocks with language $(b,=latex) are included verbatim \
-             in the output. Other code blocks with language starting \
-             with $(b,=) are dropped. This does not activate math support, \
-             use $(b,--exts) for that."
+  let doc =
+    "Code blocks with language $(b,=latex) are included verbatim in the \
+     output. Other code blocks with language starting with $(b,=) are \
+     dropped. This does not activate math support, use $(b,--exts) for that."
   in
-  Cli.backend_blocks ~doc
+  Cmarkit_cli.backend_blocks ~doc
 
 let inline_preambles =
-  let doc = "Add the content of LaTeX file $(docv) to the document preamble \
-             when $(b,--doc) is used. If unspecified a built-in preamble is \
-             written directly in the document (use $(b,-k) to keep it even \
-             when this option is specified). Repeatable."
+  let doc =
+    "Add the content of LaTeX file $(docv) to the document preamble when \
+     $(b,--doc) is used. If unspecified a built-in preamble is written \
+     directly in the document (use $(b,-k) to keep it even when this option \
+     is specified). Repeatable."
   in
   Arg.(value & opt_all string [] &
        info ~doc ["inline-preamble"] ~docv:"FILE.latex")
 
 let keep_built_in_preamble =
-  let doc = "Keep built-in preamble even if one is specified via \
-             $(b,--inline-preamble)."
+  let doc =
+    "Keep built-in preamble even if one is specified via \
+     $(b,--inline-preamble)."
   in
   Arg.(value & flag & info ["k"; "keep-built-in-preamble"] ~doc)
 
 let lift_headings =
-  let doc = "Lift headings one level up and, when $(b,--doc) is used, \
-             extract the first heading (of any level) to take it as the \
-             title; unless a title is specified via the $(b,--title) option. \
-             This is useful for certain CommonMark documents like READMEs \
-             for which taking the headings literally results in unnatural \
-             sectioning."
+  let doc =
+    "Lift headings one level up and, when $(b,--doc) is used, extract the \
+     first heading (of any level) to take it as the title; unless a title \
+     is specified via the $(b,--title) option. This is useful for certain \
+     CommonMark documents like READMEs for which taking the headings \
+     literally results in unnatural sectioning."
   in
   Arg.(value & flag & info ["l"; "lift-headings"] ~doc)
 
-let first_level_heading =
+let first_heading_level =
   let level_enum =
     [ "part", Cmarkit_latex.Part; "chapter", Chapter;
       "section", Section; "subsection", Subsection ]
@@ -192,22 +196,28 @@ let first_level_heading =
   Arg.(value & opt (Arg.enum level_enum) Cmarkit_latex.Section &
        Arg.info ["first-heading-level"] ~doc ~docv:"LEVEL")
 
-let v =
+let cmd =
   let doc = "Render CommonMark to LaTeX" in
   let man = [
     `S Manpage.s_description;
-    `P "$(tname) outputs a LaTeX fragment or document on standard output.";
-    `Pre "$(mname) $(tname) $(b,-e -c -l -h README.md > README.latex)";`Noblank;
+    `P "$(cmd) outputs a LaTeX fragment or document on standard output.";
+    `Pre "$(cmd) $(b,-e -c -l -h README.md > README.latex)";`Noblank;
     `Pre "$(b,tlmgr install enumitem listings hyperref ulem bera fontspec)";
     `Noblank;
     `Pre "$(b,xelatex README.latex)";
-    `Blocks Cli.common_man ]
+    `Blocks Cmarkit_cli.common_man ]
   in
-  Cmd.v (Cmd.info "latex" ~doc ~man) @@
-  Term.(const latex $ Cli.files $ Cli.quiet $ Cli.accumulate_defs $ Cli.strict $
-        Cli.heading_auto_ids $ backend_blocks $ lift_headings $
-        Cli.docu $ Cli.title $ author $ inline_preambles $
-        keep_built_in_preamble $ first_level_heading)
+  Cmd.make (Cmd.info "latex" ~doc ~man) @@
+  let+ files = Cmarkit_cli.files and+ quiet = Cmarkit_cli.quiet
+  and+ accumulate_defs = Cmarkit_cli.accumulate_defs
+  and+ strict = Cmarkit_cli.strict
+  and+ heading_auto_ids = Cmarkit_cli.heading_auto_ids and+ backend_blocks
+  and+ lift_headings and+ docu = Cmarkit_cli.docu and+ title = Cmarkit_cli.title
+  and+ author and+ inline_preambles and+ keep_built_in_preamble
+  and+ first_heading_level in
+  latex ~files ~quiet ~accumulate_defs ~strict ~heading_auto_ids ~backend_blocks
+    ~lift_headings ~docu ~title ~author ~inline_preambles
+    ~keep_built_in_preamble ~first_heading_level
 
 (* Built-in LaTeX preamable, defined that way to avoid source clutter *)
 

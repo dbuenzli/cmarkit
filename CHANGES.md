@@ -15,6 +15,10 @@
 
 - Updated data for Unicode 16.0.0.
 
+- Install manpages and completions.
+
+- Require `cmdliner` 2.0.0.
+
 v0.3.0 2023-12-12 La Forclaz (VS)
 ---------------------------------
 

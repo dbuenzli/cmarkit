@@ -3,21 +3,18 @@
    SPDX-License-Identifier: ISC
   ---------------------------------------------------------------------------*)
 
-open Std
 open Cmdliner
 
-let cmds = [ Cmd_commonmark.v; Cmd_html.v; Cmd_latex.v; Cmd_locs.v; ]
-
-let cmarkit =
+let cmd =
   let doc = "Process CommonMark files" in
-  let exits = Exit.exits_with_err_diff in
+  let exits = Cmarkit_cli.Exit.exits_with_err_diff in
   let man = [
     `S Manpage.s_description;
-    `P "$(mname) processes CommonMark files";
-    `Blocks Cli.common_man; ]
+    `P "$(cmd) processes CommonMark files";
+    `Blocks Cmarkit_cli.common_man; ]
   in
   Cmd.group (Cmd.info "cmarkit" ~version:"%%VERSION%%" ~doc ~exits ~man) @@
-  cmds
+  [ Cmd_commonmark.cmd; Cmd_html.cmd; Cmd_latex.cmd; Cmd_locs.cmd ]
 
-let main () = exit (Cmd.eval' cmarkit)
+let main () = exit (Cmd.eval' cmd)
 let () = if !Sys.interactive then () else main ()

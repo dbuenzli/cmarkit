@@ -3,5 +3,5 @@
    SPDX-License-Identifier: ISC
   ---------------------------------------------------------------------------*)
 
-val v : Cmdliner.Cmd.Exit.code Cmdliner.Cmd.t
-(** [v] is the command line for [html]. *)
+val cmd : Cmdliner.Cmd.Exit.code Cmdliner.Cmd.t
+(** [cmd] is the command line for [html]. *)

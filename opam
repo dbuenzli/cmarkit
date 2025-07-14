@@ -50,4 +50,15 @@ build: [
   "--with-cmdliner"
   "%{cmdliner:installed}%"
 ]
+install: [
+  "cmdliner"
+  "install"
+  "tool-support"
+  "--mandir=%{man}%"
+  "--sharedir=%{share}%"
+  "_build/src/tool/cmarkit_main.native:cmarkit" {ocaml:native}
+  "_build/src/tool/cmarkit_main.byte:cmarkit" {!ocaml:native}
+  "%{prefix}%"
+]
 dev-repo: "git+https://erratique.ch/repos/cmarkit.git"
+x-maintenance-intent: ["(latest)"]

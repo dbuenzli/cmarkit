@@ -3,7 +3,7 @@
    SPDX-License-Identifier: ISC
   ---------------------------------------------------------------------------*)
 
-open Std
+open Cmarkit_std
 
 let built_in_css = ref "" (* See at the end of the module *)
 
@@ -105,9 +105,9 @@ buffer_add_inline_jss inline_jss
 buffer_add_docs files
 
 let html
-    files quiet accumulate_defs strict heading_auto_ids backend_blocks locs
-    layout safe docu lang title author csss inline_csss keep_built_in_css jss
-    inline_jss full_featured
+    ~files ~quiet ~accumulate_defs ~strict ~heading_auto_ids ~backend_blocks
+    ~locs ~layout ~safe ~docu ~lang ~title ~author ~csss ~inline_csss
+    ~keep_built_in_css ~jss ~inline_jss ~full_featured
   =
   let resolver = Label_resolver.v ~quiet in
   let safe = safe && not full_featured in
@@ -135,66 +135,73 @@ let html
     in
     print_string s; 0
   with
-  | Failure err -> Log.err "%s" err; Exit.err_file
+  | Failure err -> Log.err "%s" err; Cmarkit_cli.Exit.err_file
 
 (* Command line interface *)
 
 open Cmdliner
+open Cmdliner.Term.Syntax
 
 let author =
-  let doc = "Document author when $(b,--doc) is used. Gets into a \
-             $(b,meta) element." in
+  let doc =
+    "Document author when $(b,--doc) is used. Gets into a $(b,meta) element."
+  in
   Arg.(value & opt (some string) None & info ["a"; "author"] ~doc ~docv:"NAME")
 
 let backend_blocks =
-  let doc = "Code blocks with language $(b,=html) are included verbatim \
-             in the output, if $(b,--unsafe) is also specified. Other code \
-             blocks with language starting with $(b,=) are dropped."
+  let doc =
+    "Code blocks with language $(b,=html) are included verbatim in the \
+     output, if $(b,--unsafe) is also specified. Other code blocks with \
+     language starting with $(b,=) are dropped."
   in
-  Cli.backend_blocks ~doc
+  Cmarkit_cli.backend_blocks ~doc
 
 let csss =
-  let doc = "Link CSS $(docv) in the document when $(b,--doc) is \
-             used. If unspecified and no other $(b,--inline-css) is \
-             specified, a basic stylesheet is written directly \
-             in the document (use $(b,-k) to keep it even when \
-             this option is specified). Repeatable."
+  let doc =
+    "Link CSS $(docv) in the document when $(b,--doc) is used. If unspecified \
+     and no other $(b,--inline-css) is specified, a basic stylesheet is \
+     written directly in the document (use $(b,-k) to keep it even when this \
+     option is specified). Repeatable."
   in
   Arg.(value & opt_all string [] & info ["css"] ~doc ~docv:"URL")
 
 let full_featured =
-  let doc = "Full-featured document. This is a synonym for options \
-             $(b,--unsafe -e -c -h) and adds a JavaScript script from \
-             a CDN to render math."
+  let doc =
+    "Full-featured document. This is a synonym for options \
+     $(b,--unsafe -e -c -h) and adds a JavaScript script from a CDN to \
+     render math."
   in
   Arg.(value & flag & info ["f"; "full-featured"] ~doc)
 
 let inline_csss =
-  let doc = "Add the content of CSS file $(docv) to the document when \
-             $(b,--doc) is used. If unspecified and no other \
-             $(b,--css) is specified, a built-in stylesheet is written \
-             directly in the document (use $(b,-k) to keep it even when \
-             this option is specified). Repeatable (gets in separate \
-             $(b,style) elements)."
+  let doc =
+    "Add the content of CSS file $(docv) to the document when $(b,--doc) is \
+     used. If unspecified and no other $(b,--css) is specified, a built-in \
+     stylesheet is written directly in the document (use $(b,-k) to keep it \
+     even when this option is specified). Repeatable (gets in separate \
+     $(b,style) elements)."
   in
   Arg.(value & opt_all string [] & info ~doc ["inline-css"] ~docv:"FILE.css")
 
 let keep_built_in_css =
-  let doc = "Keep built-in CSS even if other CSS is specified via \
-             $(b,--css) or $(b,--inline-css)."
+  let doc =
+    "Keep built-in CSS even if other CSS is specified via $(b,--css) or \
+     $(b,--inline-css)."
   in
   Arg.(value & flag & info ["k"; "keep-built-in-css"] ~doc)
 
 let jss =
-  let doc = "Link JavaScript $(docv) in the document when $(b,--doc) \
-             is used. Repeatable."
+  let doc =
+    "Link JavaScript $(docv) in the document when $(b,--doc) is used. \
+     Repeatable."
   in
   Arg.(value & opt_all string [] & info ~doc ["js"] ~docv:"URL")
 
 let inline_jss =
-  let doc = "Add the content of JavaScript file $(docv) to the document when \
-             $(b,--doc) is used. Repeatable (gets in separate \
-             $(b,script) elements)."
+  let doc =
+    "Add the content of JavaScript file $(docv) to the document when \
+     $(b,--doc) is used. Repeatable (gets in separate \
+     $(b,script) elements)."
   in
   Arg.(value & opt_all string [] & info ~doc ["inline-js"] ~docv:"FILE.js")
 
@@ -206,27 +213,34 @@ let locs =
   let doc = "Keep source text locations (has no effect on rendering)." in
   Arg.(value & flag & info ["locs"] ~doc)
 
-let v =
+let cmd =
   let doc = "Render CommonMark to HTML" in
   let man = [
     `S Manpage.s_description;
-    `P "$(tname) outputs an HTML fragment or document on standard output.";
-    `Pre "$(mname) $(tname) $(b,--unsafe -e -c -h README.md > README.html)";
+    `P "$(cmd) outputs an HTML fragment or document on standard output.";
+    `Pre "$(cmd) $(b,--unsafe -e -c -h README.md > README.html)";
     `P "With math rendering support:";
-    `Pre "$(mname) $(tname) $(b,\\\\)"; `Noblank;
+    `Pre "$(cmd) $(b,\\\\)"; `Noblank;
     `Pre "  $(b,--js) $(b,'https://cdn.jsdelivr.net/npm/\
           mathjax@3/es5/tex-svg.js') $(b,\\\\)";
     `Noblank;
     `Pre "  $(b,--unsafe -e -c -h README.md > README.html)";
     `P "The $(b,-f) option can be used instead of the previous invocation:";
-    `Pre "$(mname) $(tname) $(b,-f README.md > README.html";
-    `Blocks Cli.common_man; ]
+    `Pre "$(cmd) $(b,-f README.md > README.html";
+    `Blocks Cmarkit_cli.common_man; ]
   in
-  Cmd.v (Cmd.info "html" ~doc ~man) @@
-  Term.(const html $ Cli.files $ Cli.quiet $ Cli.accumulate_defs $ Cli.strict $
-        Cli.heading_auto_ids $ backend_blocks $ locs $ layout $ Cli.safe $
-        Cli.docu $ Cli.lang $ Cli.title $ author $ csss $ inline_csss $
-        keep_built_in_css $ jss $ inline_jss $ full_featured)
+  Cmd.make (Cmd.info "html" ~doc ~man) @@
+  let+ files = Cmarkit_cli.files and+ quiet = Cmarkit_cli.quiet
+  and+ accumulate_defs = Cmarkit_cli.accumulate_defs
+  and+ strict = Cmarkit_cli.strict
+  and+ heading_auto_ids = Cmarkit_cli.heading_auto_ids
+  and+ backend_blocks and+ locs and+ layout and+ safe = Cmarkit_cli.safe
+  and+ docu = Cmarkit_cli.docu and+ lang = Cmarkit_cli.lang
+  and+ title = Cmarkit_cli.title and+ author and+ csss and+ inline_csss
+  and+ keep_built_in_css and+ jss and+ inline_jss and+ full_featured in
+  html ~files ~quiet ~accumulate_defs ~strict ~heading_auto_ids ~backend_blocks
+    ~locs ~layout ~safe ~docu ~lang ~title ~author ~csss ~inline_csss
+    ~keep_built_in_css ~jss ~inline_jss ~full_featured
 
 (* Built-in CSS, defined that way to avoid source clutter *)
 
