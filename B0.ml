@@ -26,7 +26,7 @@ let cmarkit_lib =
 (* Tools *)
 
 let cmarkit_tool =
-  let srcs = [ `Dir ~/"tool" ] in
+  let srcs = [ `Dir ~/"src/tool" ] in
   let requires = [cmarkit; cmdliner] in
   B0_ocaml.exe "cmarkit" ~public:true ~doc:"The cmarkit tool" ~srcs ~requires
 
