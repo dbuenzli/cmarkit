@@ -180,9 +180,6 @@ let default =
     |> B0_meta.(add description_tags)
       ["codec"; "commonmark"; "markdown"; "org:erratique"; ]
     |> B0_meta.tag B0_opam.tag
-    |> B0_meta.add B0_opam.build
-      {|[["ocaml" "pkg/pkg.ml" "build" "--dev-pkg" "%{dev}%"
-                  "--with-cmdliner" "%{cmdliner:installed}%"]]|}
     |> B0_meta.add B0_opam.depopts ["cmdliner", ""]
     |> B0_meta.add B0_opam.conflicts [ "cmdliner", {|< "1.1.0"|}]
     |> B0_meta.add B0_opam.depends
@@ -193,13 +190,14 @@ let default =
         "uucp", {|dev|};
         "b0", {|dev & with-test|};
       ]
-    |> ~~ B0_opam.install
-      {|[[ "cmdliner" "install" "tool-support"
-           "--mandir=%{man}%"
-           "--sharedir=%{share}%"
-           "_build/src/tool/cmarkit_main.native:cmarkit" {ocaml:native}
-           "_build/src/tool/cmarkit_main.byte:cmarkit" {!ocaml:native}
-           "%{prefix}%"]]|}
+    |> B0_meta.add B0_opam.build
+      {|[["ocaml" "pkg/pkg.ml" "build" "--dev-pkg" "%{dev}%"
+                  "--with-cmdliner" "%{cmdliner:installed}%"]
+         ["cmdliner" "install" "tool-support"
+          "--update-opam-install=%{_:name}%.install"
+          "_build/src/tool/cmarkit_main.native:cmarkit" {ocaml:native}
+          "_build/src/tool/cmarkit_main.byte:cmarkit" {!ocaml:native}
+          "_build/cmdliner-install"] {cmdliner:installed} ]|}
   in
   B0_pack.make "default" ~doc:"cmarkit package" ~meta ~locked:true @@
   B0_unit.list ()
