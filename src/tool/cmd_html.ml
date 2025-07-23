@@ -261,7 +261,7 @@ let () = built_in_css :=
 
       --font_m: 1rem; --leading_m: 1.5rem;
       --font_s: 0.82rem;
-      --font_l: 1.125rem; --leadig_l: 1.34rem;
+      --font_l: 1.125rem; --leading_l: 1.34rem;
       --font_xl: 1.5rem; --leading_xl: 1.8rem;
       --font_xxl: 2.5rem; --leading_xxl: 3rem;
 

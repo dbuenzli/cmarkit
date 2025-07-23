@@ -1,4 +1,7 @@
 
+- Fix misspelling of `--leading_l` variable in `cmarkit html`'s
+  CSS file.
+
 - `Cmarkit_latex`. Add option `?first_heading_level` to the renderer
   to set the LaTeX heading level to use for the first CommonMark
   heading level. A corresponding option `--first-heading-level` is
