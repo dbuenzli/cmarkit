@@ -186,7 +186,7 @@ let default =
       [ "ocaml", {|>= "4.14.0"|};
         "ocamlfind", {|build|};
         "ocamlbuild", {|build|};
-        "topkg", {|build & >= "1.0.3"|};
+        "topkg", {|build & >= "1.1.0"|};
         "uucp", {|dev|};
         "b0", {|dev & with-test|};
       ]
