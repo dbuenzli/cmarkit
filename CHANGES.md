@@ -1,4 +1,8 @@
 
+
+- `cmarkit html` add option `--body-id` to identify page body 
+   elements.
+
 - Fix misspelling of `--leading_l` variable in `cmarkit html`'s
   CSS file.
 

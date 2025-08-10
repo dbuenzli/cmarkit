@@ -68,13 +68,19 @@ let buffer_add_author b = function
     Cmarkit_html.buffer_add_html_escaped_string b a;
     Buffer.add_string b "\">"
 
+let buffer_add_body_id b = function
+| None -> () | Some id ->
+    Buffer.add_string b" id=\"";
+    Cmarkit_html.buffer_add_html_escaped_string b id;
+    Buffer.add_string b "\""
+
 let title_of_file f =
   if f = "-" then "Untitled" else
   String.capitalize_ascii (Filename.remove_extension (Filename.basename f))
 
 let doc
     ~lang ~title ~author ~csss ~inline_csss ~keep_built_in_css ~jss ~inline_jss
-    buffer_add_docs files
+    ~body_id buffer_add_docs files
   =
   let title = match title with
   | Some t -> t | None -> title_of_file (List.hd files)
@@ -91,7 +97,7 @@ let doc
   <meta name="viewport" content="width=device-width, initial-scale=1.0">%a
   <title>%a</title>%a%a%a%a%a
 </head>
-<body>
+<body%a>
 %a</body>
 </html>|}
 lang
@@ -102,12 +108,13 @@ buffer_add_csss csss
 buffer_add_inline_csss inline_csss
 buffer_add_jss jss
 buffer_add_inline_jss inline_jss
+buffer_add_body_id body_id
 buffer_add_docs files
 
 let html
     ~files ~quiet ~accumulate_defs ~strict ~heading_auto_ids ~backend_blocks
     ~locs ~layout ~safe ~docu ~lang ~title ~author ~csss ~inline_csss
-    ~keep_built_in_css ~jss ~inline_jss ~full_featured
+    ~keep_built_in_css ~jss ~inline_jss ~body_id ~full_featured
   =
   let resolver = Label_resolver.v ~quiet in
   let safe = safe && not full_featured in
@@ -128,7 +135,7 @@ let html
     let s = match docu with
     | true ->
         doc ~lang ~title ~author ~csss ~inline_csss ~keep_built_in_css ~jss
-          ~inline_jss buffer_add_docs files
+          ~inline_jss ~body_id buffer_add_docs files
     | false ->
         Printf.kbprintf Buffer.contents (Buffer.create 2048) "%a"
           buffer_add_docs files
@@ -155,6 +162,13 @@ let backend_blocks =
      language starting with $(b,=) are dropped."
   in
   Cmarkit_cli.backend_blocks ~doc
+
+let body_id =
+  let doc =
+    "Add an id HTML attribute with value $(docv) to the body element when \
+     $(b,--doc) is used."
+  in
+  Arg.(value & opt (some string) None & info ["body-id"] ~doc ~docv:"ID")
 
 let csss =
   let doc =
@@ -237,10 +251,11 @@ let cmd =
   and+ backend_blocks and+ locs and+ layout and+ safe = Cmarkit_cli.safe
   and+ docu = Cmarkit_cli.docu and+ lang = Cmarkit_cli.lang
   and+ title = Cmarkit_cli.title and+ author and+ csss and+ inline_csss
-  and+ keep_built_in_css and+ jss and+ inline_jss and+ full_featured in
+  and+ keep_built_in_css and+ jss and+ inline_jss and+ body_id = body_id
+  and+ full_featured in
   html ~files ~quiet ~accumulate_defs ~strict ~heading_auto_ids ~backend_blocks
     ~locs ~layout ~safe ~docu ~lang ~title ~author ~csss ~inline_csss
-    ~keep_built_in_css ~jss ~inline_jss ~full_featured
+    ~keep_built_in_css ~jss ~inline_jss ~body_id ~full_featured
 
 (* Built-in CSS, defined that way to avoid source clutter *)
 
