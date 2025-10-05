@@ -181,7 +181,7 @@ let default =
       ["codec"; "commonmark"; "markdown"; "org:erratique"; ]
     |> B0_meta.tag B0_opam.tag
     |> B0_meta.add B0_opam.depopts ["cmdliner", ""]
-    |> B0_meta.add B0_opam.conflicts [ "cmdliner", {|< "1.1.0"|}]
+    |> B0_meta.add B0_opam.conflicts [ "cmdliner", {|< "2.0.0"|}]
     |> B0_meta.add B0_opam.depends
       [ "ocaml", {|>= "4.14.0"|};
         "ocamlfind", {|build|};
