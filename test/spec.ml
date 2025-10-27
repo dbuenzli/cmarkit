@@ -7,7 +7,7 @@ open B0_std
 open Result.Syntax
 open B0_json
 
-let version = "0.30"
+let version = "0.31.2"
 type test =
   { markdown : string;
     html : string;

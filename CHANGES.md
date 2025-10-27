@@ -1,5 +1,7 @@
 
 
+- Support for the CommonMark 0.31.2 specification.
+
 - `Cmarkit_latex`. Add option `?first_heading_level` to the renderer
   to set the LaTeX heading level to use for the first CommonMark
   heading level. A corresponding option `--first-heading-level` is

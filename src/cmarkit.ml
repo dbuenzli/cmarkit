@@ -243,7 +243,7 @@ module Inline = struct
     let backtick_count cs = cs.backtick_count
     let code_layout cs = cs.code_layout
     let code cs =
-      (* Extract code, see https://spec.commonmark.org/0.30/#code-spans *)
+      (* Extract code, see https://spec.commonmark.org/0.31.2/#code-spans *)
       let sp c = Char.equal c ' ' in
       let s = List.map Block_line.tight_to_string cs.code_layout in
       let s = String.concat " " s in
@@ -2977,7 +2977,7 @@ module Doc = struct
     make ~nl block ~defs:p.defs
 
   let unicode_version = Cmarkit_data.unicode_version
-  let commonmark_version = "0.30"
+  let commonmark_version = "0.31.2"
 end
 
 (* Maps and folds *)

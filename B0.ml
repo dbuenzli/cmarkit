@@ -4,7 +4,7 @@ open Result.Syntax
 let commonmark_version =
   (* If you update this, also update Cmarkit.commonmark_version
      and the links in src/*.mli *)
-  "0.30"
+  "0.31.2"
 
 (* OCaml library names *)
 

@@ -75,7 +75,7 @@ val escaped_string :
   ?esc_ctrl:bool -> Cmarkit_renderer.context -> Char_set.t -> string -> unit
 (** [escaped_string ?esc_ctrl c cs s] renders [s] on [c] with
     characters in [cs] backslash escaped. If [esc_ctrl] is [true]
-    (default) {{:https://spec.commonmark.org/0.30/#ascii-control-character}
+    (default) {{:https://spec.commonmark.org/0.31.2/#ascii-control-character}
     ASCII control characters} are escaped to decimal escapes. *)
 
 val buffer_add_escaped_string :
@@ -101,7 +101,7 @@ val escaped_text : Cmarkit_renderer.context -> string -> unit
     {- [!] if it is the last character of [s].}
     {- [.] or [)] only if preceeded by at most 9 digits to the start of text.}
     {- Everywhere, [*] [_] [\ ] [<] [>] [\[] [\]],
-      {{:https://spec.commonmark.org/0.30/#ascii-control-character}
+      {{:https://spec.commonmark.org/0.31.2/#ascii-control-character}
        ASCII control characters}, [$] ({{!Cmarkit.ext_math_inline}inline math
        extension}), [|] ({{!Cmarkit.ext_tables}table extension}) }} *)
 
