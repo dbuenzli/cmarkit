@@ -855,11 +855,15 @@ let html_comment ~next_line s lines ~line ~start = (* start is on <!- *)
       else loop ~next_line s lines line start acc (k + 1)
     else loop ~next_line s lines line start acc (k + 1)
   in
-  (* Check we have at least <!-- and not <!--> or <!---> *)
-  if (start + 3 > line.last) || not (s.[start + 3] = '-') ||
-     (start + 4 <= line.last && s.[start + 4] = '>') ||
-     (start + 5 <= line.last && s.[start + 4] = '-' && s.[start + 5] = '>')
-  then None else loop ~next_line s lines line start [] (start + 4)
+  (* Check we have at least <!-- *)
+  if (start + 3 > line.last) || not (s.[start + 3] = '-') then None else
+  (* Check if we have <!--> *)
+  if (start + 4 <= line.last && s.[start + 4] = '>')
+  then Some (lines, line, push_span ~line start (start + 4) [], start + 4) else
+  (* Check if we have <!---> *)
+  if (start + 5 <= line.last && s.[start + 4] = '-' && s.[start + 5] = '>')
+  then Some (lines, line, push_span ~line start (start + 5) [], start + 5) else
+  loop ~next_line s lines line start [] (start + 4)
 
 let cdata_section ~next_line s lines ~line ~start = (* start is on <![ *)
   (* https://spec.commonmark.org/current/#cdata-section *)
