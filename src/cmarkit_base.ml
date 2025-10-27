@@ -1166,7 +1166,7 @@ let html_start_cond_6_set =
       "frame"; "frameset"; "h1"; "h2"; "h3"; "h4"; "h5"; "h6"; "head"; "header";
       "hr"; "html"; "iframe"; "legend"; "li"; "link"; "main"; "menu";
       "menuitem"; "nav"; "noframes"; "ol"; "optgroup"; "option"; "p"; "param";
-      "section"; "source"; "summary"; "table"; "tbody"; "td"; "tfoot"; "th";
+      "section"; "search"; "summary"; "table"; "tbody"; "td"; "tfoot"; "th";
       "thead"; "title"; "tr"; "track"; "ul" ]
 
 let html_block_start_5 s ~last ~start = (* 3 first chars checked *)
