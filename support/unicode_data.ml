@@ -32,6 +32,7 @@ let is_ascii_punctuation u =
 
 let is_punctuation u = match Uucp.Gc.general_category u with
 | `Pc | `Pd | `Pe | `Pf | `Pi | `Po | `Ps -> true
+| `Sm | `Sc | `Sk | `So -> true
 | _ -> is_ascii_punctuation u
 
 let whitespace_list = sat_list is_whitespace
