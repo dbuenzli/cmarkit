@@ -82,53 +82,53 @@ let notrip_reasons =
     343, eager_escape; 344, eager_escape; 345, eager_escape; 346, eager_escape;
     347, eager_escape; 348, eager_escape; 349, eager_escape;
     (* Emphasis and strong emphasis *)
-    351, eager_escape; 352, eager_escape; 353, eager_escape; 357, eager_escape;
-    358, eager_escape; 359, eager_escape; 360, eager_escape; 361, eager_escape;
-    362, eager_escape; 364, eager_escape; 365, eager_escape; 366, eager_escape;
-    367, eager_escape; 370, eager_escape; 371, eager_escape; 373, eager_escape;
-    374, eager_escape; 375, eager_escape; 378, eager_escape; 379, eager_escape;
-    382, eager_escape; 383, eager_escape; 384, eager_escape; 385, eager_escape;
-    386, eager_escape; 387, eager_escape; 390, eager_escape; 391, eager_escape;
-    396, eager_escape; 397, eager_escape; 399, eager_escape; 400, eager_escape;
-    401, eager_escape; 411, eager_escape; 416, eager_escape; 419, eager_escape;
-    420, eager_escape; 433, eager_escape; 434, eager_escape; 435, eager_escape;
-    437, eager_escape; 438, eager_escape; 440, eager_escape; 441, eager_escape;
-    442, eager_escape; 443, eager_escape; 444, eager_escape; 445, eager_escape;
-    446, eager_escape; 447, eager_escape; 449, eager_escape; 450, eager_escape;
-    452, eager_escape; 453, eager_escape; 454, eager_escape; 455, eager_escape;
-    456, eager_escape; 457, eager_escape; 458, eager_escape; 468, eager_escape;
-    469, eager_escape; 470, eager_escape; 471, eager_escape; 472, eager_escape;
-    473, eager_escape; 474, eager_escape; 475, eager_escape; 476, eager_escape;
-    479, eager_escape; 480, eager_escape;
+    351, eager_escape; 352, eager_escape; 353, eager_escape; 358, eager_escape;
+    359, eager_escape; 360, eager_escape; 361, eager_escape; 362, eager_escape;
+    363, eager_escape; 365, eager_escape; 366, eager_escape; 367, eager_escape;
+    368, eager_escape; 371, eager_escape; 372, eager_escape; 374, eager_escape;
+    375, eager_escape; 376, eager_escape; 379, eager_escape; 380, eager_escape;
+    383, eager_escape; 384, eager_escape; 385, eager_escape; 386, eager_escape;
+    387, eager_escape; 388, eager_escape; 391, eager_escape; 392, eager_escape;
+    397, eager_escape; 398, eager_escape; 400, eager_escape; 401, eager_escape;
+    402, eager_escape; 412, eager_escape; 417, eager_escape; 420, eager_escape;
+    421, eager_escape; 434, eager_escape; 435, eager_escape; 436, eager_escape;
+    438, eager_escape; 439, eager_escape; 441, eager_escape; 442, eager_escape;
+    443, eager_escape; 444, eager_escape; 445, eager_escape; 446, eager_escape;
+    447, eager_escape; 448, eager_escape; 450, eager_escape; 451, eager_escape;
+    453, eager_escape; 454, eager_escape; 455, eager_escape; 456, eager_escape;
+    457, eager_escape; 458, eager_escape; 459, eager_escape; 469, eager_escape;
+    470, eager_escape; 471, eager_escape; 472, eager_escape; 473, eager_escape;
+    474, eager_escape; 475, eager_escape; 476, eager_escape; 477, eager_escape;
+    480, eager_escape; 481, eager_escape;
     (* Links *)
-    487, eager_escape; 489, eager_escape; 490, eager_escape; 492, eager_escape;
-    493, eager_escape; 495, eager_escape; 496, eager_escape; 499, escape_drop;
-    502, charref;
-    505, eager_escape; 505, eager_escape; 507, eager_escape; 510, eager_escape;
-    511, eager_escape; 512, eager_escape; 513, eager_escape; 517, eager_escape;
-    518, eager_escape; 519, eager_escape; 520, eager_escape; 521, eager_escape;
-    522, eager_escape; 523, eager_escape; 524, eager_escape; 525, eager_escape;
-    527, eager_escape; 531, eager_escape; 532, eager_escape; 533, eager_escape;
-    534, eager_escape; 535, eager_escape; 536, eager_escape; 537, eager_escape;
-    541, eager_escape; 542, eager_escape;
-    544, eager_escape; 545, eager_escape; 546, eager_escape; 547, eager_escape;
-    550, eager_escape; 551, eager_escape; 555, eager_escape; 558, eager_escape;
-    559, eager_escape; 562, eager_escape; 563, eager_escape; 568, eager_escape;
-    570, eager_escape;
+    488, eager_escape; 490, eager_escape; 490, eager_escape; 493, eager_escape;
+    494, eager_escape; 496, eager_escape; 496, eager_escape; 500, escape_drop;
+    503, charref;
+    506, eager_escape; 506, eager_escape; 508, eager_escape; 511, eager_escape;
+    512, eager_escape; 513, eager_escape; 512, eager_escape; 518, eager_escape;
+    519, eager_escape; 520, eager_escape; 521, eager_escape; 522, eager_escape;
+    523, eager_escape; 524, eager_escape; 525, eager_escape; 526, eager_escape;
+    528, eager_escape; 532, eager_escape; 533, eager_escape; 534, eager_escape;
+    535, eager_escape; 536, eager_escape; 537, eager_escape; 538, eager_escape;
+    542, eager_escape; 543, eager_escape;
+    545, eager_escape; 546, eager_escape; 547, eager_escape; 548, eager_escape;
+    551, eager_escape; 552, eager_escape; 556, eager_escape; 559, eager_escape;
+    560, eager_escape; 563, eager_escape; 564, eager_escape; 569, eager_escape;
+    571, eager_escape;
     (* Images *)
-    586, eager_escape; 589, eager_escape; 591, eager_escape;
+    587, eager_escape; 590, eager_escape; 592, eager_escape;
     (* Autolinks *)
-    601, eager_escape; 605, eager_escape (* and escape_drop *);
-    606, eager_escape; 607, eager_escape;
-    608, eager_escape; 609, eager_escape;
+    602, eager_escape; 606, eager_escape (* and escape_drop *);
+    607, eager_escape; 608, eager_escape;
+    609, eager_escape; 610, eager_escape;
     (* Raw HTML *)
-    617, eager_escape; 618, eager_escape; 619, eager_escape; 620, eager_escape;
-    621, eager_escape; 623, eager_escape; 625, eager_escape; 626, eager_escape;
-    632, eager_escape (* and escape_drop *);
+    618, eager_escape; 619, eager_escape; 620, eager_escape; 621, eager_escape;
+    622, eager_escape; 624, eager_escape; 626, eager_escape; 627, eager_escape;
+    633, eager_escape (* and escape_drop *);
     (* Hard line breaks *)
-    644, eager_escape; 646, eager_escape;
+    645, eager_escape; 647, eager_escape;
     (* Textual content *)
-    650, eager_escape;
+    651, eager_escape;
   ]
 
 let status st ex_num =
