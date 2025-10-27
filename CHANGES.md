@@ -22,7 +22,7 @@
 - Fix misspelling of `--leading_l` variable in `cmarkit html`'s
   CSS file.
 
-- Updated data for Unicode 16.0.0.
+- Updated data for Unicode 17.0.0.
 
 - Require (depopt) `cmdliner` 2.0.0.
 
