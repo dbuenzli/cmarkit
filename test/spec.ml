@@ -11,13 +11,13 @@ let version = "0.31.2"
 type test =
   { markdown : string;
     html : string;
-    example : int;
+    id : int;
     start_line : int;
     end_line : int;
     section : string }
 
-let test markdown html example start_line end_line section =
-  { markdown; html; example; start_line; end_line; section }
+let test markdown html id start_line end_line section =
+  { markdown; html; id; start_line; end_line; section }
 
 let testq =
   Jsonq.(succeed test $
@@ -56,6 +56,39 @@ let diff ~spec cmarkit =
 
 let ok = Fmt.st [`Fg `Green]
 let fail = Fmt.st [`Fg `Red]
+
+let file =
+  let doc = "$(docv) is the test file." in
+  Cmdliner.Arg.(value & opt filepath "test/spec.json" & info ["file"] ~doc)
+
+let example_nums =
+  let nums =
+    let parser s = match int_of_string_opt s with
+    | Some i -> Ok [i]
+    | None ->
+        try
+          let exit_on_none = function None -> raise Exit | Some s -> s in
+          let (l, r) = String.split_first ~sep:"-" s |> exit_on_none in
+          let l = int_of_string_opt l |> exit_on_none in
+          let r = int_of_string_opt r |> exit_on_none in
+          let lo, hi = if l < r then l, r else r, l in
+          let acc = ref [] in
+          for i = hi downto lo do acc := i :: !acc done;
+          Ok !acc
+        with
+        | Exit -> Fmt.error "%S: not a number or range number" s
+    in
+    let pp = Fmt.(list ~sep:sp int) in
+    let docv = "NUM[-NUM]" in
+    Cmdliner.Arg.Conv.make ~docv ~parser ~pp ()
+  in
+  let doc =
+    "$(docv) are the identifiers of the examples to test (all is none)"
+  in
+  let nums = Cmdliner.Arg.(value & pos_all nums [] & info [] ~doc) in
+  Cmdliner.Term.(const List.concat $ nums)
+
+let tests = Cmdliner.Term.(const (fun x y -> x, y) $ file $ example_nums)
 
 let cli ~exe () =
   let usage = Fmt.str "Usage %s [--file FILE.json] NUM[-NUM]…" exe in

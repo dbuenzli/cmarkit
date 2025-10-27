@@ -153,25 +153,25 @@ let test (t : Spec.test) ~show_diff =
   let doc = Cmarkit.Doc.of_string ~layout:true t.markdown in
   let md = Cmarkit_commonmark.of_doc doc in
   let has_notrip_reason =
-    Option.is_some (List.assoc_opt t.example notrip_reasons)
+    Option.is_some (List.assoc_opt t.id notrip_reasons)
   in
   if String.equal md t.markdown then begin
     if has_notrip_reason then begin
-      status `Trip t.example;
+      status `Trip t.id;
       Log.warn (fun m -> m "Example trips but is only supposed to be correct.")
     end;
     `Trip
   end else
   let doc' = Cmarkit.Doc.of_string md in
   let html = Cmarkit_renderer.doc_to_string renderer doc' in
-  let pp_reason ppf () = match List.assoc_opt t.example notrip_reasons with
+  let pp_reason ppf () = match List.assoc_opt t.id notrip_reasons with
   | None -> () | Some reason -> Fmt.pf ppf "Reason: %s@," reason
   in
   match String.equal html t.html with
   | true ->
       if show_diff || not has_notrip_reason then begin
         let diff = Spec.diff ~spec:t.markdown md in
-        status `Ok t.example;
+        status `Ok t.id;
         Log.stdout (fun m -> m "@[<v>%a%s@]" pp_reason () diff)
       end;
       `Ok
@@ -179,7 +179,7 @@ let test (t : Spec.test) ~show_diff =
       let md_diff = Spec.diff ~spec:t.markdown md in
       let html_diff = Spec.diff ~spec:t.html html in
       let diff = String.concat "\n" [t.markdown; md_diff; html_diff] in
-      status `Fail t.example;
+      status `Fail t.id;
       if has_notrip_reason then begin
         Log.warn (fun m -> m "Example fails but should be correct.")
       end;
@@ -196,7 +196,7 @@ let test_no_layout (t : Spec.test) =
   let html_diff = Spec.diff ~spec:t.html html in
   let d = [t.markdown; "Markdown render:"; md_diff; "HTML render:"; html_diff]in
   let diff = String.concat "\n" d in
-  status `Fail t.example;
+  status `Fail t.id;
   Log.stdout (fun m -> m "@[<v>Parse without layout render:@,%s@]" diff);
   Error ()
 
@@ -224,7 +224,7 @@ let log_result n valid fail no_layout_fail =
 let run_tests test_file examples show_diff =
   Log.if_error ~use:1 @@
   let* tests = Spec.parse_tests test_file in
-  let select (t : Spec.test) = examples = [] || List.mem t.example examples in
+  let select (t : Spec.test) = examples = [] || List.mem t.id examples in
   let do_test (n, ok, fail, no_layout_fail as acc) t =
     if not (select t) then acc else
     let no_layout_fail = match test_no_layout t with

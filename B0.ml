@@ -58,10 +58,9 @@ let update_spec_tests =
   let tests =
     Fmt.str "https://spec.commonmark.org/%s/spec.json" commonmark_version
   in
-  let dest = B0_env.in_scope_dir env ~/"test/spec.json" in
-  let dest = Os.Cmd.out_file ~force:true ~make_path:false dest in
-  let* curl = B0_env.get_cmd env Cmd.(arg "curl" % "-L" % tests) in
-  Os.Cmd.run ~stdout:dest curl
+  let dst = B0_env.in_scope_dir env ~/"test/spec.json" in
+  let force = true and make_path = false in
+  B0_action_kit.download_url env ~force ~make_path tests ~dst
 
 let spec_srcs = [`File ~/"test/spec.mli"; `File ~/"test/spec.ml"]
 
@@ -82,7 +81,7 @@ let test =
 let test_spec =
   let doc = "Test CommonMark specification conformance tests" in
   let srcs = `File ~/"test/test_spec.ml" :: spec_srcs in
-  let requires = [ b0_std; b0_file; cmarkit ] in
+  let requires = [ cmdliner; b0_std; cmarkit ] in
   let meta =
     B0_meta.empty
     |> B0_meta.tag B0_meta.test
@@ -94,7 +93,7 @@ let test_spec =
 let trip_spec =
   let doc = "Test CommonMark renderer on conformance tests" in
   let srcs = `File ~/"test/trip_spec.ml" :: spec_srcs in
-  let requires = [ b0_std; b0_file; cmarkit ] in
+  let requires = [ cmdliner; b0_std; cmarkit ] in
   let meta =
     B0_meta.empty
     |> B0_meta.tag B0_meta.test
