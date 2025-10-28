@@ -63,43 +63,31 @@ let update_spec_tests =
 
 let spec_srcs = [`File ~/"test/spec.mli"; `File ~/"test/spec.ml"]
 
+let test_spec =
+  let doc = "Test CommonMark specification conformance tests" in
+  let requires = [cmdliner; b0_std; cmarkit] in
+  let meta = B0_meta.empty |> ~~ B0_unit.Action.cwd `Scope_dir in
+  B0_ocaml.test ~/"test/test_spec.ml" ~doc ~meta ~srcs:spec_srcs ~requires
+
+let test_trip =
+  let doc = "Test CommonMark renderer (notably on conformance tests)" in
+  let requires = [cmdliner; b0_std; cmarkit] in
+  let meta = B0_meta.empty |> ~~ B0_unit.Action.cwd `Scope_dir in
+  B0_ocaml.test ~/"test/test_render_md.ml" ~doc ~meta ~srcs:spec_srcs ~requires
+
+let test_bugs =
+  let doc = "Tests for reported bugs" in
+  let srcs = [ `File ~/"test/test_bugs.ml" ] in
+  let requires = [cmdliner; b0_std; cmarkit] in
+  let meta = B0_meta.empty |> B0_meta.tag B0_meta.test in
+  B0_ocaml.test  ~/"test/test_bugs.ml" ~doc ~meta ~srcs ~requires
+
 let bench =
   let doc = "Simple standard CommonMark to HTML renderer for benchmarking" in
   let srcs = [ `File ~/"test/bench.ml" ] in
   let requires = [cmarkit] in
   let meta = B0_meta.(empty |> tag bench) in
   B0_ocaml.exe "bench" ~doc ~meta ~srcs ~requires
-
-let test =
-  let doc = "Other expectation tests" in
-  let srcs = [ `File ~/"test/test.ml" ] in
-  let requires = [cmarkit] in
-  let meta = B0_meta.empty |> B0_meta.tag B0_meta.test in
-  B0_ocaml.exe "test" ~doc ~meta ~srcs ~requires
-
-let test_spec =
-  let doc = "Test CommonMark specification conformance tests" in
-  let srcs = `File ~/"test/test_spec.ml" :: spec_srcs in
-  let requires = [cmdliner; b0_std; cmarkit] in
-  let meta =
-    B0_meta.empty
-    |> B0_meta.tag B0_meta.test
-    |> B0_meta.tag B0_meta.run
-    |> ~~ B0_unit.Action.cwd `Scope_dir
-  in
-  B0_ocaml.exe "test_spec" ~doc ~meta ~srcs ~requires
-
-let trip_spec =
-  let doc = "Test CommonMark renderer on conformance tests" in
-  let srcs = `File ~/"test/trip_spec.ml" :: spec_srcs in
-  let requires = [cmdliner; b0_std; cmarkit] in
-  let meta =
-    B0_meta.empty
-    |> B0_meta.tag B0_meta.test
-    |> B0_meta.tag B0_meta.run
-    |> ~~ B0_unit.Action.cwd `Scope_dir
-  in
-  B0_ocaml.exe "trip_spec" ~doc ~meta ~srcs ~requires
 
 let pathological =
   let doc = "Test a CommonMark parser on pathological tests." in
@@ -109,22 +97,9 @@ let pathological =
 
 let examples =
   let doc = "Doc sample code" in
-  let srcs = [ `File ~/"test/examples.ml" ] in
-  let requires = [cmarkit] in
-  let meta = B0_meta.empty |> B0_meta.(tag test) in
-  B0_ocaml.exe "examples" ~doc ~meta ~srcs ~requires
+  B0_ocaml.test ~/"test/examples.ml" ~doc ~run:false ~requires:[cmarkit]
 
 (* Expectation tests *)
-
-let expect_test ctx =
-  let test = B0_expect.get_unit_exe_file_cmd ctx test in
-  let cwd = B0_env.scope_dir (B0_expect.env ctx) in
-  B0_expect.stdout ctx ~cwd ~stdout:(Fpath.v "test.expect") test
-
-let expect_trip_spec ctx =
-  let trip_spec = B0_expect.get_unit_exe_file_cmd ctx trip_spec in
-  let cwd = B0_env.scope_dir (B0_expect.env ctx) in
-  B0_expect.stdout ctx ~cwd ~stdout:(Fpath.v "spec.trip") trip_spec
 
 let expect_cmarkit_renders ctx =
   let cmarkit = B0_expect.get_unit_exe_file_cmd ctx cmarkit_tool in
@@ -154,12 +129,10 @@ let expect_cmarkit_renders ctx =
 let expect =
   let doc = "Test expectations" in
   let meta = B0_meta.(empty |> tag test |> tag run) in
-  let units = [test; trip_spec; cmarkit_tool] in
+  let units = [cmarkit_tool] in
   B0_unit.of_action' "expect" ~meta ~units ~doc @@
   B0_expect.action_func ~base:(Fpath.v "test/expect") @@ fun ctx ->
   expect_cmarkit_renders ctx;
-  expect_trip_spec ctx;
-  expect_test ctx;
   ()
 
 (* Packs *)

@@ -5,11 +5,122 @@
 
 open B0_std
 open Result.Syntax
+open B0_testing
 open B0_json
 
-let notrip_reasons =
+let renderer =
+  (* Specification tests render empty elements as XHTML. *)
+  Cmarkit_html.xhtml_renderer ~safe:false ()
+
+let log_render_md_diff t ~fnd =
+  Test.log_raw "@[<v>Render diff for %a@,%a@]@?"
+    Spec.pp_test_url t
+    (Test.Diff.pp Test.T.lines ~fnd ~exp:t.markdown) ()
+
+let log_render_html_diff t ~fnd =
+  Test.log_raw "@[<v>Render HTML diff for %a@,%a@]@?"
+    Spec.pp_test_url t
+    (Test.Diff.pp Test.T.lines ~fnd ~exp:t.html) ()
+
+let test_spec_args = Test.Arg.make ()
+let test_spec_no_layout =
+  let name = "specification examples renders (no layout parse)" in
+  Test.test' test_spec_args name @@ fun ((tests, label), show_diff) ->
+  Spec.test_examples ~label tests @@ fun t ->
+  (* Parse without layout, render commonmark, reparse, render to HTML *)
+  let doc = Cmarkit.Doc.of_string ~layout:false t.Spec.markdown in
+  let md = Cmarkit_commonmark.of_doc doc in
+  let doc' = Cmarkit.Doc.of_string md in
+  let html = Cmarkit_renderer.doc_to_string renderer doc' in
+  if String.equal html t.html then begin
+    Test.pass ();
+    if show_diff then log_render_md_diff t ~fnd:md
+  end else begin
+    Test.fail "%a" Spec.pp_test_url t;
+    Test.log_raw
+      "@[<v>Incorrect with no layout parse@,Source:@,%aMarkdown render:@,%a\
+       HTML render:@,%a@]@?"
+      Fmt.lines t.Spec.markdown
+      (Test.Diff.pp Test.T.lines ~fnd:md ~exp:t.markdown) ()
+      (Test.Diff.pp Test.T.lines ~fnd:html ~exp:t.html) ()
+  end
+
+let test_spec_fail_allowed = ref [] (* initiailized below for readability *)
+let test_spec_notrip_reasons = ref [] (* initialized below for readability *)
+let test_spec =
+  let name = "specification examples (with layout parse)" in
+  Test.test' test_spec_args name @@ fun ((tests, label), show_diff) ->
+  let trip_count = ref 0 in
+  let correct_count = ref 0 in
+  let incorrect_count = ref 0 in
+  begin Spec.test_examples ~label tests @@ fun t ->
+    (* Parse with layout, render commonmark, if not equal reparse the render
+       and render it to HTML, if that succeeds it's a correct rendering. *)
+    let notrip_reason = List.assoc_opt t.id !test_spec_notrip_reasons in
+    let doc = Cmarkit.Doc.of_string ~layout:true t.markdown in
+    let md = Cmarkit_commonmark.of_doc doc in
+    if String.equal md t.markdown then begin (* round trip *)
+      if Option.is_none notrip_reason then (Test.pass (); incr trip_count) else
+      Test.fail
+        "@[<v>Example %a@,%a@,Should not round trip because: %s@,\
+         But it does! Remove the reason.@]"
+        Spec.pp_test_url t Fmt.lines t.markdown (Option.get notrip_reason)
+    end else begin
+      let doc' = Cmarkit.Doc.of_string md in
+      let html = Cmarkit_renderer.doc_to_string renderer doc' in
+      if String.equal html t.html then begin (* correct *)
+        incr correct_count;
+        if Option.is_some notrip_reason then begin
+          Test.pass ();
+          if show_diff then begin
+            Test.log_raw "Only correct because: %s" (Option.get notrip_reason);
+            log_render_md_diff t ~fnd:md
+          end
+        end else begin
+          Test.fail
+          "@[<v>Example %a@,Does not round trip but no reason given.@]"
+          Spec.pp_test_url t;
+          log_render_md_diff t ~fnd:md
+        end
+      end else begin
+        if List.mem t.id !test_spec_fail_allowed
+        then (Test.pass (); incr incorrect_count) else
+        begin
+          Test.fail "@[<v>Example %a@,Fails but not allowed to fail."
+            Spec.pp_test_url t;
+          log_render_md_diff t ~fnd:md;
+          log_render_md_diff t ~fnd:html;
+        end
+      end
+    end
+  end;
+  let total = List.length tests in
+  Test.log "%3d/%d are incorrect (can happen see docs)" !incorrect_count total;
+  Test.log "%3d/%d are only correct" !correct_count total;
+  Test.log "%3d/%d round trip" !trip_count total;
+  ()
+
+let main () =
+  let args =
+    let show_diff =
+      let doc = "Show diffs of correct CommonMark renders" in
+      Cmdliner.Arg.(value & flag & info ["show-diff"] ~doc)
+    in
+    Cmdliner.Term.(const (fun x y -> (x, y)) $ Spec.tests $ show_diff)
+  in
+  Test.main' args @@ fun ((file, ids), show_diff) ->
+  let tests = Spec.parse_tests file |> Test.error_to_failstop in
+  let tests, label = Spec.select tests ids in
+  let args = Test.Arg.[value test_spec_args ((tests, label), show_diff)] in
+  Test.autorun ~args ()
+
+let () =
+  test_spec_fail_allowed := []; (* None at the moment *)
+  test_spec_notrip_reasons :=
   (* For those renders that are only correct we indicate here
-     the reason why they do not round trip. *)
+     the reason why they do not round trip. Sadly these numbers
+     must be updated when the spec is updated. See
+     https://github.com/commonmark/commonmark-spec/issues/763 *)
   let tabs = "Tab stop as spaces" in
   let block_quote_regular = "Block quote regularization" in
   let indented_blanks = "Indented blank line" in
@@ -82,7 +193,8 @@ let notrip_reasons =
     343, eager_escape; 344, eager_escape; 345, eager_escape; 346, eager_escape;
     347, eager_escape; 348, eager_escape; 349, eager_escape;
     (* Emphasis and strong emphasis *)
-    351, eager_escape; 352, eager_escape; 353, eager_escape; 358, eager_escape;
+    351, eager_escape; 352, eager_escape; 353, eager_escape; 354, eager_escape;
+    358, eager_escape;
     359, eager_escape; 360, eager_escape; 361, eager_escape; 362, eager_escape;
     363, eager_escape; 365, eager_escape; 366, eager_escape; 367, eager_escape;
     368, eager_escape; 371, eager_escape; 372, eager_escape; 374, eager_escape;
@@ -101,11 +213,11 @@ let notrip_reasons =
     474, eager_escape; 475, eager_escape; 476, eager_escape; 477, eager_escape;
     480, eager_escape; 481, eager_escape;
     (* Links *)
-    488, eager_escape; 490, eager_escape; 490, eager_escape; 493, eager_escape;
-    494, eager_escape; 496, eager_escape; 496, eager_escape; 500, escape_drop;
+    488, eager_escape; 490, eager_escape; 491, eager_escape; 493, eager_escape;
+    494, eager_escape; 496, eager_escape; 497, eager_escape; 500, escape_drop;
     503, charref;
     506, eager_escape; 506, eager_escape; 508, eager_escape; 511, eager_escape;
-    512, eager_escape; 513, eager_escape; 512, eager_escape; 518, eager_escape;
+    512, eager_escape; 513, eager_escape; 514, eager_escape; 518, eager_escape;
     519, eager_escape; 520, eager_escape; 521, eager_escape; 522, eager_escape;
     523, eager_escape; 524, eager_escape; 525, eager_escape; 526, eager_escape;
     528, eager_escape; 532, eager_escape; 533, eager_escape; 534, eager_escape;
@@ -123,125 +235,11 @@ let notrip_reasons =
     609, eager_escape; 610, eager_escape;
     (* Raw HTML *)
     618, eager_escape; 619, eager_escape; 620, eager_escape; 621, eager_escape;
-    622, eager_escape; 624, eager_escape; 626, eager_escape; 627, eager_escape;
-    633, eager_escape (* and escape_drop *);
+    622, eager_escape; 624, eager_escape; 626, eager_escape; 632, eager_escape;
     (* Hard line breaks *)
-    645, eager_escape; 647, eager_escape;
+    644, eager_escape; 646, eager_escape;
     (* Textual content *)
-    651, eager_escape;
+    650, eager_escape;
   ]
-
-let status st ex_num =
-  Log.stdout @@ fun m ->
-  let pp_ex ppf n =
-    Fmt.pf ppf "https://spec.commonmark.org/%s/#example-%d" Spec.version n
-  in
-  let pp_st, st = match st with
-  | `Trip -> Spec.ok, "TRIP"
-  | `Ok -> Spec.ok, " OK "
-  | `Fail -> Spec.fail, "FAIL"
-  in
-  m "[%a] %a" pp_st st Fmt.(code' pp_ex) ex_num
-
-let renderer =
-  (* Specification tests render empty elements as XHTML. *)
-  Cmarkit_html.xhtml_renderer ~safe:false ()
-
-let test (t : Spec.test) ~show_diff =
-  (* Parse with layout, render commonmark, if not equal reparse the render
-     and render it to HTML, if that succeeds it's a correct rendering. *)
-  let doc = Cmarkit.Doc.of_string ~layout:true t.markdown in
-  let md = Cmarkit_commonmark.of_doc doc in
-  let has_notrip_reason =
-    Option.is_some (List.assoc_opt t.id notrip_reasons)
-  in
-  if String.equal md t.markdown then begin
-    if has_notrip_reason then begin
-      status `Trip t.id;
-      Log.warn (fun m -> m "Example trips but is only supposed to be correct.")
-    end;
-    `Trip
-  end else
-  let doc' = Cmarkit.Doc.of_string md in
-  let html = Cmarkit_renderer.doc_to_string renderer doc' in
-  let pp_reason ppf () = match List.assoc_opt t.id notrip_reasons with
-  | None -> () | Some reason -> Fmt.pf ppf "Reason: %s@," reason
-  in
-  match String.equal html t.html with
-  | true ->
-      if show_diff || not has_notrip_reason then begin
-        let diff = Spec.diff ~spec:t.markdown md in
-        status `Ok t.id;
-        Log.stdout (fun m -> m "@[<v>%a%s@]" pp_reason () diff)
-      end;
-      `Ok
-  | false ->
-      let md_diff = Spec.diff ~spec:t.markdown md in
-      let html_diff = Spec.diff ~spec:t.html html in
-      let diff = String.concat "\n" [t.markdown; md_diff; html_diff] in
-      status `Fail t.id;
-      if has_notrip_reason then begin
-        Log.warn (fun m -> m "Example fails but should be correct.")
-      end;
-      Log.stdout (fun m -> m "@[<v>%a%s@]" pp_reason () diff); `Fail
-
-let test_no_layout (t : Spec.test) =
-  (* Parse without layout, render commonmark, reparse, render to HTML *)
-  let doc = Cmarkit.Doc.of_string ~layout:false t.markdown in
-  let md = Cmarkit_commonmark.of_doc doc in
-  let doc' = Cmarkit.Doc.of_string md in
-  let html = Cmarkit_renderer.doc_to_string renderer doc' in
-  if String.equal html t.html then Ok () else
-  let md_diff = Spec.diff ~spec:t.markdown md in
-  let html_diff = Spec.diff ~spec:t.html html in
-  let d = [t.markdown; "Markdown render:"; md_diff; "HTML render:"; html_diff]in
-  let diff = String.concat "\n" d in
-  status `Fail t.id;
-  Log.stdout (fun m -> m "@[<v>Parse without layout render:@,%s@]" diff);
-  Error ()
-
-let log_result n valid fail no_layout_fail =
-  let trip = n - valid - fail in
-  if fail <> 0 then
-    (Log.stdout
-     @@ fun m -> m "[%a] %d out of %d fail." Spec.fail "FAIL" fail n);
-  if valid <> 0 then
-    (Log.stdout @@ fun m ->
-     m "[%a] %d out of %d are correct."
-       Spec.ok " OK " valid n);
-  if trip <> 0 then
-    (Log.stdout @@ fun m ->
-     let count = if n = trip then "All" else Fmt.str "%d out of" trip in
-     m "[%a] %s %d round trip." Spec.ok "TRIP" count n);
-  Log.stdout @@ fun m ->
-  let count, pp, st = match no_layout_fail with
-  | 0 -> "All", Spec.ok, " OK "
-  | f -> Fmt.str "%d out of" f, Spec.fail, "FAIL"
-  in
-  Log.stdout @@ fun m ->
-  m "[%a] %s %d on parse without layout." pp st count n
-
-let run_tests test_file examples show_diff =
-  Log.if_error ~use:1 @@
-  let* tests = Spec.parse_tests test_file in
-  let select (t : Spec.test) = examples = [] || List.mem t.id examples in
-  let do_test (n, ok, fail, no_layout_fail as acc) t =
-    if not (select t) then acc else
-    let no_layout_fail = match test_no_layout t with
-    | Ok () -> no_layout_fail | Error _ -> no_layout_fail + 1
-    in
-    match test t ~show_diff with
-    | `Trip -> (n + 1, ok, fail, no_layout_fail)
-    | `Ok -> (n + 1, ok + 1, fail, no_layout_fail)
-    | `Fail -> (n + 1, ok, fail + 1, no_layout_fail)
-  in
-  let counts = (0, 0, 0, 0) in
-  let n, ok, fail, no_layout_fail = List.fold_left do_test counts tests in
-  log_result n ok fail no_layout_fail;
-  Ok 0
-
-let main () =
-  let show_diff, file, examples = Spec.cli ~exe:"trip_spec" () in
-  run_tests file examples show_diff
 
 let () = if !Sys.interactive then () else exit (main ())

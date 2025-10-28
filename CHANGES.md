@@ -1,16 +1,16 @@
 
 
-- Support for the CommonMark 0.31.2 specification.
+- Support for the CommonMark 0.31.2 specification (#17)
 
 - `Cmarkit_latex`. Add option `?first_heading_level` to the renderer
   to set the LaTeX heading level to use for the first CommonMark
   heading level. A corresponding option `--first-heading-level` is
   added to `cmarkit latex`.  Thanks to Léo Andrès for the patch (#16).
 
-- `cmarkit html`: add option `--body-id` to identify page body
+- `cmarkit html` command: add option `--body-id` to identify page body
   elements.
 
-- `cmarkit`: install manpages and completions.
+- `cmarkit` tool: install manpages and completions.
 
 - Fix `Cmarkit.Mapper`. Do not drop empty table cells.
   Thanks to Hannes Mehnert for the report (#14).
