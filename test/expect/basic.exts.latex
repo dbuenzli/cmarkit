@@ -123,6 +123,13 @@ we have a code block here too.
 \item{}
 [x] Not a task
 \end{itemize}
+\item{} \lbrack\phantom{x}\rbrack \enspace
+task
+
+\begin{itemize}
+\item{} \lbrack\phantom{x}\rbrack \enspace
+sub task
+\end{itemize}
 \item{} \lbrack\phantom{x}\rbrack \enspace\item{} \lbrack\phantom{x}\rbrack \enspace
 a
 
