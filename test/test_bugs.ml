@@ -40,16 +40,16 @@ let test_nested_tasks =
 |};
   let indentation_woes = (* Shows suboptimal identation behaviour *)
 {|
-- [ ]  task
+- [ ] task
 
-       description
+      description
 |}
   in
   Snap.lines (html ~strict:false indentation_woes) @@ __POS_OF__
 {|<ul>
 <li><div class="task"><input type="checkbox" disabled><div>
 <p>task</p>
-<pre><code> description
+<pre><code>description
 </code></pre>
 </div></div></li>
 </ul>
