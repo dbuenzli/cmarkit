@@ -2,6 +2,13 @@
 
 - Support for the CommonMark 0.31.2 specification (#17)
 
+- Change task items extension semantics: the task marker is no longer
+  considered part of the list marker. The new semantics can lead to 
+  surprises with item subparagraphs which can show up as indented code 
+  blocks, but it avoids huge indentations for subtasks and is consistent 
+  with what at least GFM and md4c do.
+  Thanks to Thomas Gazagnaire for the report (#24).
+
 - `Cmarkit_latex`. Add option `?first_heading_level` to the renderer
   to set the LaTeX heading level to use for the first CommonMark
   heading level. A corresponding option `--first-heading-level` is

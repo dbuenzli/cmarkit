@@ -2439,7 +2439,7 @@ module Block_struct = struct
     let before_marker = indent and marker_size = last - p.current_char + 1 in
     let marker = current_line_span p ~first:p.current_char ~last in
     let after_marker = accept_list_marker_and_indent p ~marker_size ~last in
-    let ext_task_marker, ext_task_marker_size = match p.exts with
+    let ext_task_marker, _ext_task_marker_size = match p.exts with
     | false -> None, 0
     | true ->
         let start = p.current_char and last = p.current_line_last_char in
@@ -2453,7 +2453,7 @@ module Block_struct = struct
             in
             Some (u, current_line_span p ~first:start ~last), 4
     in
-    let min = indent + marker_size + after_marker + ext_task_marker_size in
+    let min = indent + marker_size + after_marker in
     min, { before_marker; marker; after_marker; ext_task_marker;
            blocks = add_open_blocks p [] }
 

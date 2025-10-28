@@ -1756,7 +1756,7 @@ v}
     {2:ext_list_task_items List task items}
 
     According to a mix of
-    {{:https://github.com/mity/md4c/blob/master/test/tasklists.txt}md4c},
+    {{:https://github.com/mity/md4c/blob/master/test/spec-tasklists.txt}md4c},
     {{:https://docs.gitlab.com/ee/user/markdown.html#task-lists}GLFM},
     {{:https://github.github.com/gfm/#task-list-item}GFM} and personal
     ad-hoc brewery.
@@ -1773,7 +1773,7 @@ v}
     considers there was one). The Unicode character gets stored in
     {!Block.List_item.ext_task_marker} and counts as one column
     regardless of the character's render width. The task marker
-    including the final space is considered part of the list marker as
+    including the final space is not considered part of the list marker as
     far as subsequent indentation is concerned.
 
     The Unicode character indicates the status of the task. That's up

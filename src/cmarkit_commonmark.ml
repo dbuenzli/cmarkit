@@ -133,7 +133,7 @@ let rec indent c =
       nchars c before ' '; C.string c m; nchars c after ' ';
       let after = match task with
       | None -> after
-      | Some u -> C.byte c '['; C.utf_8_uchar c u; C.string c "] "; after + 4
+      | Some u -> C.byte c '['; C.utf_8_uchar c u; C.string c "] "; after
       in
       (* On the next call we'll just indent for the list item *)
       loop c (`I (before + String.length m + after) :: acc) is

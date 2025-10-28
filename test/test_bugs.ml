@@ -6,6 +6,56 @@
 open B0_std
 open B0_testing
 
+let html ?(safe = true) ~strict md =
+  Cmarkit_html.of_doc ~safe (Cmarkit.Doc.of_string ~strict md)
+
+let test_nested_tasks =
+  Test.test "nested tasks semantics (#24)" @@ fun () ->
+  let tasks = (* This should be nested lists both with extensions and without *)
+{|
+- [ ] hey
+- [ ] ho
+  - [ ] sub
+|}
+  in
+  Snap.lines (html ~strict:true tasks) @@ __POS_OF__
+{|<ul>
+<li>[ ] hey</li>
+<li>[ ] ho
+<ul>
+<li>[ ] sub</li>
+</ul>
+</li>
+</ul>
+|};
+  Snap.lines (html ~strict:false tasks) @@ __POS_OF__
+{|<ul>
+<li><div class="task"><input type="checkbox" disabled><div>hey</div></div></li>
+<li><div class="task"><input type="checkbox" disabled><div>ho
+<ul>
+<li><div class="task"><input type="checkbox" disabled><div>sub</div></div></li>
+</ul>
+</div></div></li>
+</ul>
+|};
+  let indentation_woes = (* Shows suboptimal identation behaviour *)
+{|
+- [ ]  task
+
+       description
+|}
+  in
+  Snap.lines (html ~strict:false indentation_woes) @@ __POS_OF__
+{|<ul>
+<li><div class="task"><input type="checkbox" disabled><div>
+<p>task</p>
+<pre><code> description
+</code></pre>
+</div></div></li>
+</ul>
+|};
+  ()
+
 let test_mapper_table_bug_14 =
   Test.test "mapper table bug (#14)" @@ fun () ->
   let table =
