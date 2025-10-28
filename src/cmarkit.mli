@@ -1539,7 +1539,7 @@ module Mapper : sig
 
       This example sets all code blocks of document [doc] without info string
       to [lang].
-      {[
+{[
 let set_unknown_code_block_lang ~lang doc =
   let open Cmarkit in
   let default = lang, Meta.none in
@@ -1731,7 +1731,7 @@ end
 
     {3:ext_math_display Display math}
 
-    {v
+{v
 It's better to get that $$ \left( \sum_{k=1}^n a_k b_k \right)^2 $$
 on its own line. A math block may also be more convenient:
 
