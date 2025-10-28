@@ -20,8 +20,7 @@ let b0_file = B0_ocaml.libname "b0.file"
 
 let cmarkit_lib =
   let srcs = [ `Dir ~/"src" ] in
-  let requires = [] and name = "cmarkit-lib" in
-  B0_ocaml.lib cmarkit ~name ~doc:"The cmarkit library" ~srcs ~requires
+  B0_ocaml.lib cmarkit ~name:"cmarkit-lib" ~doc:"The cmarkit library" ~srcs
 
 (* Tools *)
 
@@ -81,37 +80,37 @@ let test =
 let test_spec =
   let doc = "Test CommonMark specification conformance tests" in
   let srcs = `File ~/"test/test_spec.ml" :: spec_srcs in
-  let requires = [ cmdliner; b0_std; cmarkit ] in
+  let requires = [cmdliner; b0_std; cmarkit] in
   let meta =
     B0_meta.empty
     |> B0_meta.tag B0_meta.test
     |> B0_meta.tag B0_meta.run
-    |> B0_meta.add B0_unit.Action.cwd `Scope_dir
+    |> ~~ B0_unit.Action.cwd `Scope_dir
   in
   B0_ocaml.exe "test_spec" ~doc ~meta ~srcs ~requires
 
 let trip_spec =
   let doc = "Test CommonMark renderer on conformance tests" in
   let srcs = `File ~/"test/trip_spec.ml" :: spec_srcs in
-  let requires = [ cmdliner; b0_std; cmarkit ] in
+  let requires = [cmdliner; b0_std; cmarkit] in
   let meta =
     B0_meta.empty
     |> B0_meta.tag B0_meta.test
     |> B0_meta.tag B0_meta.run
-    |> B0_meta.add B0_unit.Action.cwd `Scope_dir
+    |> ~~ B0_unit.Action.cwd `Scope_dir
   in
   B0_ocaml.exe "trip_spec" ~doc ~meta ~srcs ~requires
 
 let pathological =
   let doc = "Test a CommonMark parser on pathological tests." in
   let srcs = [ `File ~/"test/pathological.ml" ] in
-  let requires = [ b0_std; unix ] in
+  let requires = [b0_std; unix] in
   B0_ocaml.exe "pathological" ~doc ~srcs ~requires
 
 let examples =
   let doc = "Doc sample code" in
   let srcs = [ `File ~/"test/examples.ml" ] in
-  let requires = [ cmarkit ] in
+  let requires = [cmarkit] in
   let meta = B0_meta.empty |> B0_meta.(tag test) in
   B0_ocaml.exe "examples" ~doc ~meta ~srcs ~requires
 
@@ -168,20 +167,19 @@ let expect =
 let default =
   let meta =
     B0_meta.empty
-    |> B0_meta.(add authors) ["The cmarkit programmers"]
-    |> B0_meta.(add maintainers)
-       ["Daniel Bünzli <daniel.buenzl i@erratique.ch>"]
-    |> B0_meta.(add homepage) "https://erratique.ch/software/cmarkit"
-    |> B0_meta.(add online_doc) "https://erratique.ch/software/cmarkit/doc"
-    |> B0_meta.(add licenses) ["ISC"]
-    |> B0_meta.(add repo) "git+https://erratique.ch/repos/cmarkit.git"
-    |> B0_meta.(add issues) "https://github.com/dbuenzli/cmarkit/issues"
-    |> B0_meta.(add description_tags)
+    |> ~~ B0_meta.authors ["The cmarkit programmers"]
+    |> ~~ B0_meta.maintainers ["Daniel Bünzli <daniel.buenzl i@erratique.ch>"]
+    |> ~~ B0_meta.homepage "https://erratique.ch/software/cmarkit"
+    |> ~~ B0_meta.online_doc "https://erratique.ch/software/cmarkit/doc"
+    |> ~~ B0_meta.licenses ["ISC"]
+    |> ~~ B0_meta.repo "git+https://erratique.ch/repos/cmarkit.git"
+    |> ~~ B0_meta.issues "https://github.com/dbuenzli/cmarkit/issues"
+    |> ~~ B0_meta.description_tags
       ["codec"; "commonmark"; "markdown"; "org:erratique"; ]
     |> B0_meta.tag B0_opam.tag
-    |> B0_meta.add B0_opam.depopts ["cmdliner", ""]
-    |> B0_meta.add B0_opam.conflicts [ "cmdliner", {|< "2.0.0"|}]
-    |> B0_meta.add B0_opam.depends
+    |> ~~ B0_opam.depopts ["cmdliner", ""]
+    |> ~~ B0_opam.conflicts [ "cmdliner", {|< "2.0.0"|}]
+    |> ~~ B0_opam.depends
       [ "ocaml", {|>= "4.14.0"|};
         "ocamlfind", {|build|};
         "ocamlbuild", {|build|};
@@ -189,7 +187,7 @@ let default =
         "uucp", {|dev|};
         "b0", {|dev & with-test|};
       ]
-    |> B0_meta.add B0_opam.build
+    |> ~~ B0_opam.build
       {|[["ocaml" "pkg/pkg.ml" "build" "--dev-pkg" "%{dev}%"
                   "--with-cmdliner" "%{cmdliner:installed}%"]
          ["cmdliner" "install" "tool-support"
