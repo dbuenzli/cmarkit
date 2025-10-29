@@ -93,7 +93,7 @@ let buffer_add_escaped_text b s =
         flush b max start i; buffer_add_bslash_esc b c; loop b s max next c next
     | '&' when esc_amp s max next ->
         flush b max start i; buffer_add_bslash_esc b c; loop b s max next c next
-    | '!' when i = max ->
+    | '!' | '~' when i = max ->
         flush b max start i; buffer_add_bslash_esc b c; loop b s max next c next
     | '.' | ')' when esc_item_marker s i ->
         flush b max start i; buffer_add_bslash_esc b c; loop b s max next c next

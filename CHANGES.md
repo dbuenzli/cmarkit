@@ -25,6 +25,10 @@
 - Fix incorrect escaping of backticks in CommonMark renderings
   (#26).
 
+- Fix incorrect escaping of tildes for CommonMark rendering interpreted
+  with extensions (strikethrough).
+  Thanks to Tianyi Song for the eport (#20).
+
 - Fix `Cmarkit.Mapper`. Do not drop empty table cells.
   Thanks to Hannes Mehnert for the report (#14).
 
