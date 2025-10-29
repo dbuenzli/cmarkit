@@ -1233,7 +1233,13 @@ module Inline_struct = struct
       then loop ~exts s lines line ~prev_bslash:(not prev_bslash) acc (k+1) else
       let acc, next = match s.[k] with
       | '`' -> add_backtick_token acc s line ~prev_bslash ~start:k
-      | c when prev_bslash -> acc, k + 1
+      | c when prev_bslash ->
+          (* For backticks we need to treat backslash specially. Because
+             if we are in a code span backslashes are always treated literally.
+             But at the tokenization stage we don't know if we are
+             in a code span or not. This is the reason why this comes
+             after the case for '`'. *)
+          acc, k + 1
       | '*' | '_' -> try_add_emphasis_token acc s line ~start:k
       | ']' -> Right_brack { start = k } :: acc, k + 1
       | '[' -> Link_start { start = k; image = false } :: acc, k + 1
@@ -1332,7 +1338,10 @@ module Inline_struct = struct
 
   let try_code p toks start_line ~start:cstart ~count ~escaped =
     (* https://spec.commonmark.org/current/#code-span *)
-    if escaped || not (has_backticks ~count ~after:cstart p.cidx) then None else
+    let count = if escaped then count - 1 else count in
+    if count <= 0 then None else
+    let cstart = if escaped then cstart + 1 else cstart in
+    if not (has_backticks ~count ~after:cstart p.cidx) then None else
     let rec match_backticks toks line ~count spans k = match toks with
     | [] -> None
     | Backticks { start; count = c; _ } :: toks ->

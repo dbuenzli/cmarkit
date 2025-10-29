@@ -19,6 +19,9 @@
 
 - `cmarkit` tool: install manpages and completions.
 
+- Fix incorrect parsing of code spans if they start with an escaped
+  backtick (#21).
+
 - Fix `Cmarkit.Mapper`. Do not drop empty table cells.
   Thanks to Hannes Mehnert for the report (#14).
 

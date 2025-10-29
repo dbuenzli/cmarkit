@@ -9,6 +9,19 @@ open B0_testing
 let html ?(safe = true) ~strict md =
   Cmarkit_html.of_doc ~safe (Cmarkit.Doc.of_string ~strict md)
 
+let test_code_span_escape =
+  Test.test "code span escape start (#21)" @@ fun () ->
+  let this_is_code =
+{|\```the code``|}
+  in
+  Snap.lines (html ~strict:true this_is_code) @@ __POS_OF__
+{|<p>`<code>the code</code></p>
+|};
+  Snap.lines (html ~strict:false this_is_code) @@ __POS_OF__
+{|<p>`<code>the code</code></p>
+|};
+  ()
+
 let test_nested_tasks =
   Test.test "nested tasks semantics (#24)" @@ fun () ->
   let tasks = (* This should be nested lists both with extensions and without *)
