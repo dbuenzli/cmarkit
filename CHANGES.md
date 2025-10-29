@@ -22,13 +22,16 @@
 - Fix incorrect parsing of code spans if they start with an escaped
   backtick (#21).
 
+- Fix incorrect escaping of backticks in CommonMark renderings
+  (#26).
+
 - Fix `Cmarkit.Mapper`. Do not drop empty table cells.
   Thanks to Hannes Mehnert for the report (#14).
 
 - Fix out of bounds exception when lists are terminated by the end of
   file. Thanks to Ty Overby for the report (#18).
 
-- Fix invalid markup generated for cancelled task items. 
+- Fix invalid HTML markup generated for cancelled task items.
   Thanks to Sebastien Mondet for the report (#15).
 
 - Fix misspelling of `--leading_l` variable in `cmarkit html`'s

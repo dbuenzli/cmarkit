@@ -45,7 +45,7 @@ let test_spec_no_layout =
       (Test.Diff.pp Test.T.lines ~fnd:html ~exp:t.html) ()
   end
 
-let test_spec_fail_allowed = ref [] (* initiailized below for readability *)
+let test_spec_fail_allowed = ref [] (* initialized below for readability *)
 let test_spec_notrip_reasons = ref [] (* initialized below for readability *)
 let test_spec =
   let name = "specification examples (with layout parse)" in

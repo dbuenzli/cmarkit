@@ -9,6 +9,34 @@ open B0_testing
 let html ?(safe = true) ~strict md =
   Cmarkit_html.of_doc ~safe (Cmarkit.Doc.of_string ~strict md)
 
+let commonmark ~strict md =
+  Cmarkit_commonmark.of_doc (Cmarkit.Doc.of_string ~strict md)
+
+let correct_commonmark_render ?(layout = true) ~strict ~fnd ~exp () =
+  let fnd_doc = Cmarkit.Doc.of_string ~layout ~strict fnd in
+  let exp_doc = Cmarkit.Doc.of_string ~layout ~strict exp in
+  let fnd_html = Cmarkit_html.of_doc ~safe:false fnd_doc in
+  let exp_html = Cmarkit_html.of_doc ~safe:false exp_doc in
+  if String.equal fnd_html exp_html then Test.pass () else
+  begin
+    Test.fail "Incorrect CommonMark rendering";
+    Test.log_raw
+      "@[<v>Source:@,%a@,Markdown render diff:@,%a\
+       HTML render diff:@,%a@]@?"
+      Fmt.lines exp
+      (Test.Diff.pp Test.T.lines ~fnd ~exp) ()
+      (Test.Diff.pp Test.T.lines ~fnd:fnd_html ~exp:exp_html) ()
+  end
+
+let test_backtick_escapes =
+  Test.test "backtick escapes renders (#26)" @@ fun () ->
+  let not_code = "```foo``" in
+  let not_code_md = commonmark ~strict:true not_code in
+  correct_commonmark_render ~strict:true ~fnd:not_code_md ~exp:not_code ();
+  Snap.lines not_code_md @@ __POS_OF__
+    {|\`\`\`foo\`\`|};
+  ()
+
 let test_code_span_escape =
   Test.test "code span escape start (#21)" @@ fun () ->
   let this_is_code =

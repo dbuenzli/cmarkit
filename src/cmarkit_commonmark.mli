@@ -94,13 +94,13 @@ val escaped_text : Cmarkit_renderer.context -> string -> unit
 
     {ul
     {- These block markers: [-] [+] [_] [=] only if present at [s.[0]].}
-    {- Only the first of runs of them: [#] [`]}
+    {- Only the first of runs of them: [#]}
     {- Only the first of a run longer than 1: [~]
        ({{!Cmarkit.ext_strikethrough}strikethrough extension}).}
     {- [&] if followed by an US-ASCII letter or [#].}
     {- [!] if it is the last character of [s].}
     {- [.] or [)] only if preceeded by at most 9 digits to the start of text.}
-    {- Everywhere, [*] [_] [\ ] [<] [>] [\[] [\]],
+    {- Everywhere, [`] [*] [_] [\ ] [<] [>] [\[] [\]],
       {{:https://spec.commonmark.org/0.31.2/#ascii-control-character}
        ASCII control characters}, [$] ({{!Cmarkit.ext_math_inline}inline math
        extension}), [|] ({{!Cmarkit.ext_tables}table extension}) }} *)

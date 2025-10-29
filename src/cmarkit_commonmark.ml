@@ -87,7 +87,7 @@ let buffer_add_escaped_text b s =
     if Cmarkit_base.Ascii.is_control c then
       (flush b max start i; buffer_add_dec_esc b c; loop b s max next c next)
     else match c with
-    | '#' | '`' when not (Char.equal prev c) ->
+    | '#' when not (Char.equal prev c) ->
         flush b max start i; buffer_add_bslash_esc b c; loop b s max next c next
     | '~' when esc_tilde s max prev next ->
         flush b max start i; buffer_add_bslash_esc b c; loop b s max next c next
@@ -97,7 +97,7 @@ let buffer_add_escaped_text b s =
         flush b max start i; buffer_add_bslash_esc b c; loop b s max next c next
     | '.' | ')' when esc_item_marker s i ->
         flush b max start i; buffer_add_bslash_esc b c; loop b s max next c next
-    | '\\' | '<' | '>' | '[' | ']' | '*' | '_' | '$' | '|' ->
+    | '`' | '\\' | '<' | '>' | '[' | ']' | '*' | '_' | '$' | '|' ->
         flush b max start i; buffer_add_bslash_esc b c; loop b s max next c next
     | _ ->
         loop b s max start c next
