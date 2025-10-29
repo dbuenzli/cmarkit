@@ -19,7 +19,8 @@ let correct_commonmark_render ?(layout = true) ~strict ~fnd ~exp () =
   let exp_html = Cmarkit_html.of_doc ~safe:false exp_doc in
   if String.equal fnd_html exp_html then Test.pass () else
   begin
-    Test.fail "Incorrect CommonMark rendering";
+    let kind = if strict then "strict" else "extended" in
+    Test.fail "Incorrect %s CommonMark rendering" kind;
     Test.log_raw
       "@[<v>Source:@,%a@,Markdown render diff:@,%a\
        HTML render diff:@,%a@]@?"
@@ -28,12 +29,14 @@ let correct_commonmark_render ?(layout = true) ~strict ~fnd ~exp () =
       (Test.Diff.pp Test.T.lines ~fnd:fnd_html ~exp:exp_html) ()
   end
 
+(* Tests *)
+
 let test_backtick_escapes =
   Test.test "backtick escapes renders (#26)" @@ fun () ->
-  let not_code = "```foo``" in
-  let not_code_md = commonmark ~strict:true not_code in
-  correct_commonmark_render ~strict:true ~fnd:not_code_md ~exp:not_code ();
-  Snap.lines not_code_md @@ __POS_OF__
+  let exp = {|```foo``|} (* This is not code *) in
+  let fnd = commonmark ~strict:true exp in
+  correct_commonmark_render ~strict:true ~fnd ~exp ();
+  Snap.lines fnd @@ __POS_OF__
     {|\`\`\`foo\`\`|};
   ()
 
