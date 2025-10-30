@@ -36,8 +36,8 @@ let checked_commonmark ?layout ~strict src =
 
 (* Tests *)
 
-let test_sharp_escapes =
-  Test.test "sharp escapes renders (#25)" @@ fun () ->
+let test_hash_escapes =
+  Test.test "hash escapes renders (#25)" @@ fun () ->
   let src = {|hello #world|} in
   Snap.lines (checked_commonmark ~strict:true src) @@ __POS_OF__
     {|hello #world|};

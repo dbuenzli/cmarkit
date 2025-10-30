@@ -6,23 +6,22 @@
 open B0_std
 open Result.Syntax
 open B0_testing
-open B0_json
 
-let renderer =
-  (* Specification tests render empty elements as XHTML. *)
+let renderer = (* Specification tests render empty elements as XHTML. *)
   Cmarkit_html.xhtml_renderer ~safe:false ()
 
 let log_render_md_diff t ~fnd =
   Test.log_raw "@[<v>Render diff for %a@,%a@]@?"
-    Spec.pp_test_url t
-    (Test.Diff.pp Test.T.lines ~fnd ~exp:t.markdown) ()
+    Spec.pp_test_url t (Test.Diff.pp Test.T.lines ~fnd ~exp:t.markdown) ()
 
 let log_render_html_diff t ~fnd =
   Test.log_raw "@[<v>Render HTML diff for %a@,%a@]@?"
-    Spec.pp_test_url t
-    (Test.Diff.pp Test.T.lines ~fnd ~exp:t.html) ()
+    Spec.pp_test_url t (Test.Diff.pp Test.T.lines ~fnd ~exp:t.html) ()
+
+(* Tests *)
 
 let test_spec_args = Test.Arg.make ()
+
 let test_spec_no_layout =
   let name = "specification examples renders (no layout parse)" in
   Test.test' test_spec_args name @@ fun ((tests, label), show_diff) ->
@@ -32,10 +31,9 @@ let test_spec_no_layout =
   let md = Cmarkit_commonmark.of_doc doc in
   let doc' = Cmarkit.Doc.of_string md in
   let html = Cmarkit_renderer.doc_to_string renderer doc' in
-  if String.equal html t.html then begin
-    Test.pass ();
-    if show_diff then log_render_md_diff t ~fnd:md
-  end else begin
+  if String.equal html t.html
+  then (Test.pass (); if show_diff then log_render_md_diff t ~fnd:md) else
+  begin
     Test.fail "%a" Spec.pp_test_url t;
     Test.log_raw
       "@[<v>Incorrect with no layout parse@,Source:@,%aMarkdown render:@,%a\
@@ -97,7 +95,8 @@ let test_spec =
   let total = List.length tests in
   let results =
     Fmt.str "@[<v>%3d/%d are incorrect (can happen see docs)@,\
-             %3d/%d are only correct@,%3d/%d round trip@]"
+                  %3d/%d are only correct@,\
+                  %3d/%d round trip@]"
       !incorrect_count total
       !correct_count total
       !trip_count total;
