@@ -19,6 +19,9 @@
 
 - `cmarkit` tool: install manpages and completions.
 
+- Less eager escaping of `#` characters in CommonMark renderings.
+  Thanks to Thomas Gazagnaire for the report (#25).
+
 - Fix incorrect parsing of code spans if they start with an escaped
   backtick (#21).
 

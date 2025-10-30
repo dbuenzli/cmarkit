@@ -10,7 +10,7 @@ follows:
 The triggering CommonMark
 ```
 
-# Bug \#10 
+# Bug #10 
 
 In cells toplevel text nodes not at the beginning or end of the cell
 get dropped.
@@ -24,7 +24,7 @@ get dropped.
 | *a*`a`                  |
 | <p>foo</p>              |
 
-# Bug \#15 
+# Bug #15 
 
 Invalid markup generated for cancelled task.
 

@@ -94,7 +94,7 @@ val escaped_text : Cmarkit_renderer.context -> string -> unit
 
     {ul
     {- These block markers: [-] [+] [_] [=] only if present at [s.[0]].}
-    {- Only the first of runs of them: [#]}
+    {- Only if at the end of the string or if followed by a space or a tab: [#]}
     {- Only the first of a run longer than 1: [~]
        (avoid creating a {{!Cmarkit.ext_strikethrough}strikethrough extension}
         or a code fence).}

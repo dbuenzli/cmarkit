@@ -10,7 +10,7 @@ follows:
 The triggering CommonMark
 ```
 
-# Issue \#11
+# Issue #11
 
 Escape ordered item markers at the beginning of paragraphs correctly.
 These should be paragraphs when rendered to markdown not list items.

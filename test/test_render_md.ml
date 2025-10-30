@@ -136,6 +136,7 @@ let () =
   let indented_blanks = "Indented blank line" in
   let eager_escape = "Eager escaping" in
   let escape_drop = "Escape drop (not needed)" in
+  let escape_diff = "Escaped differently" in
   let charref = "Entity or character reference substitution" in
   let empty_item = "List item with empty first line gets space after marker" in
   let unlazy = "Suppress lazy continuation line" in
@@ -155,7 +156,7 @@ let () =
     44, eager_escape; 45, eager_escape; 46, eager_escape; 49, eager_escape;
     55, eager_escape; 56, eager_escape;
     (* ATX headings *)
-    63, eager_escape; 64, eager_escape; 70, eager_escape; 74, eager_escape;
+    63, eager_escape; 65, escape_diff; 70, eager_escape; 74, eager_escape;
     75, eager_escape; 76, eager_escape;
     (* Setext headings *)
     85, indented_blanks; 87, eager_escape; 88, eager_escape; 90, eager_escape;

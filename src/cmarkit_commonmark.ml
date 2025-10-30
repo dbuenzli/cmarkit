@@ -88,8 +88,9 @@ let buffer_add_escaped_text b s =
     while !k >= 0 && Cmarkit_base.Ascii.is_digit s.[!k] do decr k done;
     !k < 0
   in
-  let esc_hash s max prev next =
-    not (Char.equal prev '#')
+  let esc_hash s max _prev next =
+    (* We need to be careful about not creating heading closing sequences. *)
+    next > max || s.[next] = ' ' || s.[next] = '\t'
   in
   let flush b max start i =
     if start <= max then Buffer.add_substring b s start (i - start)

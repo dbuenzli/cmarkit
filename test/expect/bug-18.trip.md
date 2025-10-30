@@ -1,4 +1,4 @@
-# Issue \#18 
+# Issue #18 
 
 When a list marker is followed by end of file, we crash.
 

@@ -40,14 +40,14 @@ let test_sharp_escapes =
   Test.test "sharp escapes renders (#25)" @@ fun () ->
   let src = {|hello #world|} in
   Snap.lines (checked_commonmark ~strict:true src) @@ __POS_OF__
-    {|hello \#world|};
+    {|hello #world|};
   Snap.lines (checked_commonmark ~strict:false src) @@ __POS_OF__
-    {|hello \#world|};
+    {|hello #world|};
   let src = {|## foo #\##|} in
   Snap.lines (checked_commonmark ~strict:true src) @@ __POS_OF__
-    {|## foo \###|};
+    {|## foo ##\#|};
   Snap.lines (checked_commonmark ~strict:false src) @@ __POS_OF__
-    {|## foo \###|};
+    {|## foo ##\#|};
   let src = {|### foo ###     |} in
   Snap.lines (checked_commonmark ~layout:false ~strict:true src) @@ __POS_OF__
     {|### foo|};
