@@ -103,7 +103,8 @@ val escaped_text : Cmarkit_renderer.context -> string -> unit
        create an unwanted image link if followed by a link inline or
        a code fence if followed by a {{!Cmarkit.ext_strikethrough}strikethrough}
        inline).}
-    {- [.] or [)] only if preceeded by at most 9 digits to the start of text.}
+    {- [.] or [)] only if preceeded by at most 9 digits to the start of text
+       and followed by a space, tab or the end of string.}
     {- Everywhere, [`] [*] [_] [\ ] [<] [>] [\[] [\]],
       {{:https://spec.commonmark.org/0.31.2/#ascii-control-character}
        ASCII control characters}, [$] ({{!Cmarkit.ext_math_inline}inline math

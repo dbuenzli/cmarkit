@@ -22,6 +22,9 @@
 - Less eager escaping of `#` characters in CommonMark renderings.
   Thanks to Thomas Gazagnaire for the report (#25).
 
+- Less eager escaping of `.` and `)` characters in CommonMark rendering. 
+  Thanks to Ty Overby for the report (#19).
+
 - Fix incorrect parsing of code spans if they start with an escaped
   backtick (#21).
 

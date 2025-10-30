@@ -82,7 +82,8 @@ let buffer_add_escaped_text b s =
     not (Char.equal prev '~') &&
     (next <= max && s.[next] = '~' || next > max (* last is '~'*))
   in
-  let esc_item_marker s i =
+  let esc_item_marker s max i next =
+    (next > max || s.[next] = ' ' || s.[next] = '\t') &&
     if i = 0 || i > 9 (* marker has from 1-9 digits *) then false else
     let k = ref (i - 1) in
     while !k >= 0 && Cmarkit_base.Ascii.is_digit s.[!k] do decr k done;
@@ -110,7 +111,7 @@ let buffer_add_escaped_text b s =
         flush b max start i; buffer_add_bslash_esc b c; loop b s max next c next
     | '!' when i = max ->
         flush b max start i; buffer_add_bslash_esc b c; loop b s max next c next
-    | '.' | ')' when esc_item_marker s i ->
+    | '.' | ')' when esc_item_marker s max i next ->
         flush b max start i; buffer_add_bslash_esc b c; loop b s max next c next
     | '`' | '\\' | '<' | '>' | '[' | ']' | '*' | '_' | '$' | '|' ->
         flush b max start i; buffer_add_bslash_esc b c; loop b s max next c next

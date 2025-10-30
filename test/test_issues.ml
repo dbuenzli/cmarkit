@@ -36,6 +36,33 @@ let checked_commonmark ?layout ~strict src =
 
 (* Tests *)
 
+let test_dot_escapes =
+  Test.test "item maker escapes renders (#19)" @@ fun () ->
+  let src = {|3.14 is pi|} in
+  Snap.lines (checked_commonmark ~strict:true src) @@ __POS_OF__
+    {|3.14 is pi|};
+  let src = {|pi is 3.14|} in
+  Snap.lines (checked_commonmark ~strict:true src) @@ __POS_OF__
+    {|pi is 3.14|};
+  let src = {|pi is approximately 3.|} in
+  Snap.lines (checked_commonmark ~strict:true src) @@ __POS_OF__
+    {|pi is approximately 3.|};
+  let src = {|3\. is approximately pi|} in
+  Snap.lines (checked_commonmark ~strict:true src) @@ __POS_OF__
+    {|3\. is approximately pi|};
+  let src =
+{|1\.
+Above needs an escape below does not (but we don't have the state)
+1.
+|}
+  in
+  Snap.lines (checked_commonmark ~strict:true src) @@ __POS_OF__
+{|1\.
+Above needs an escape below does not (but we don't have the state)
+1\.
+|};
+  ()
+
 let test_hash_escapes =
   Test.test "hash escapes renders (#25)" @@ fun () ->
   let src = {|hello #world|} in
