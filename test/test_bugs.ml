@@ -31,18 +31,26 @@ let correct_commonmark_render ?(layout = true) ~strict ~fnd ~exp () =
 
 (* Tests *)
 
+(*
+let test_sharp_escapes =
+  Test.test "sharp escapes renders (#25)" @@ fun () ->
+  let exp = {|hello #world|} in
+  let fnd = commonmark ~strict:false exp in
+  correct_commonmark_render ~strict:false ~fnd ~exp ();
+*)
+
+
 let test_tilde_escapes =
   Test.test "tilde escapes renders (#20)" @@ fun () ->
   let exp = {|\~~~strike me~~|} in
   let fnd = commonmark ~strict:false exp in
   correct_commonmark_render ~strict:false ~fnd ~exp ();
-  Snap.lines exp @@ __POS_OF__
+  Snap.lines fnd @@ __POS_OF__
     {|\~~~strike me~~|};
-  let exp = {|\~~~strike me~~|} in
   let fnd = commonmark ~strict:true exp in
   correct_commonmark_render ~strict:true ~fnd ~exp ();
-  Snap.lines exp @@ __POS_OF__
-    {|\~~~strike me~~|};
+  Snap.lines fnd @@ __POS_OF__
+    {|\~~~strike me\~~|};
   ()
 
 let test_backtick_escapes =
