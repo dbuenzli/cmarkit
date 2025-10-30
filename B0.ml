@@ -66,21 +66,17 @@ let spec_srcs = [`File ~/"test/spec.mli"; `File ~/"test/spec.ml"]
 let test_spec =
   let doc = "Test CommonMark specification conformance tests" in
   let requires = [cmdliner; b0_std; cmarkit] in
-  let meta = B0_meta.empty |> ~~ B0_unit.Action.cwd `Scope_dir in
-  B0_ocaml.test ~/"test/test_spec.ml" ~doc ~meta ~srcs:spec_srcs ~requires
+  B0_ocaml.test ~/"test/test_spec.ml" ~doc ~srcs:spec_srcs ~requires
 
 let test_trip =
   let doc = "Test CommonMark renderer (notably on conformance tests)" in
   let requires = [cmdliner; b0_std; cmarkit] in
-  let meta = B0_meta.empty |> ~~ B0_unit.Action.cwd `Scope_dir in
-  B0_ocaml.test ~/"test/test_render_md.ml" ~doc ~meta ~srcs:spec_srcs ~requires
+  B0_ocaml.test ~/"test/test_render_md.ml" ~doc ~srcs:spec_srcs ~requires
 
 let test_bugs =
-  let doc = "Tests for reported bugs" in
-  let srcs = [ `File ~/"test/test_bugs.ml" ] in
+  let doc = "Tests for reported issues" in
   let requires = [cmdliner; b0_std; cmarkit] in
-  let meta = B0_meta.empty |> B0_meta.tag B0_meta.test in
-  B0_ocaml.test  ~/"test/test_bugs.ml" ~doc ~meta ~srcs ~requires
+  B0_ocaml.test ~/"test/test_issues.ml" ~doc ~requires
 
 let bench =
   let doc = "Simple standard CommonMark to HTML renderer for benchmarking" in

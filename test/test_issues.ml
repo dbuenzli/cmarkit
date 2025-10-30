@@ -9,8 +9,8 @@ open B0_testing
 let html ?(safe = true) ~strict md =
   Cmarkit_html.of_doc ~safe (Cmarkit.Doc.of_string ~strict md)
 
-let commonmark ~strict md =
-  Cmarkit_commonmark.of_doc (Cmarkit.Doc.of_string ~strict md)
+let commonmark ?(layout = true) ~strict md =
+  Cmarkit_commonmark.of_doc (Cmarkit.Doc.of_string ~layout ~strict md)
 
 let correct_commonmark_render ?(layout = true) ~strict ~fnd ~exp () =
   let fnd_doc = Cmarkit.Doc.of_string ~layout ~strict fnd in
@@ -29,36 +29,49 @@ let correct_commonmark_render ?(layout = true) ~strict ~fnd ~exp () =
       (Test.Diff.pp Test.T.lines ~fnd:fnd_html ~exp:exp_html) ()
   end
 
+let checked_commonmark ?layout ~strict src =
+  let fnd = commonmark ?layout ~strict src in
+  correct_commonmark_render ?layout ~strict ~fnd ~exp:src ();
+  fnd
+
 (* Tests *)
 
-(*
 let test_sharp_escapes =
   Test.test "sharp escapes renders (#25)" @@ fun () ->
-  let exp = {|hello #world|} in
-  let fnd = commonmark ~strict:false exp in
-  correct_commonmark_render ~strict:false ~fnd ~exp ();
-*)
-
+  let src = {|hello #world|} in
+  Snap.lines (checked_commonmark ~strict:true src) @@ __POS_OF__
+    {|hello \#world|};
+  Snap.lines (checked_commonmark ~strict:false src) @@ __POS_OF__
+    {|hello \#world|};
+  let src = {|## foo #\##|} in
+  Snap.lines (checked_commonmark ~strict:true src) @@ __POS_OF__
+    {|## foo \###|};
+  Snap.lines (checked_commonmark ~strict:false src) @@ __POS_OF__
+    {|## foo \###|};
+  let src = {|### foo ###     |} in
+  Snap.lines (checked_commonmark ~layout:false ~strict:true src) @@ __POS_OF__
+    {|### foo|};
+  Snap.lines (checked_commonmark ~strict:false src) @@ __POS_OF__
+    {|### foo ###     |};
+  ()
 
 let test_tilde_escapes =
   Test.test "tilde escapes renders (#20)" @@ fun () ->
-  let exp = {|\~~~strike me~~|} in
-  let fnd = commonmark ~strict:false exp in
-  correct_commonmark_render ~strict:false ~fnd ~exp ();
-  Snap.lines fnd @@ __POS_OF__
-    {|\~~~strike me~~|};
-  let fnd = commonmark ~strict:true exp in
-  correct_commonmark_render ~strict:true ~fnd ~exp ();
-  Snap.lines fnd @@ __POS_OF__
+  (* The escaping here differs in strict or non-strict mode because
+     the AST is different *)
+  let src = {|\~~~strike me~~|} in
+  Snap.lines (checked_commonmark ~strict:true src) @@ __POS_OF__
     {|\~~~strike me\~~|};
+  Snap.lines (checked_commonmark ~strict:false src) @@ __POS_OF__
+    {|\~~~strike me~~|};
   ()
 
 let test_backtick_escapes =
   Test.test "backtick escapes renders (#26)" @@ fun () ->
-  let exp = {|```foo``|} (* This is not code *) in
-  let fnd = commonmark ~strict:true exp in
-  correct_commonmark_render ~strict:true ~fnd ~exp ();
-  Snap.lines fnd @@ __POS_OF__
+  let src = {|```foo``|} (* This is not code *) in
+  Snap.lines (checked_commonmark ~strict:true src) @@ __POS_OF__
+    {|\`\`\`foo\`\`|};
+  Snap.lines (checked_commonmark ~strict:false src) @@ __POS_OF__
     {|\`\`\`foo\`\`|};
   ()
 

@@ -59,6 +59,16 @@ let buffer_add_escaped_string ?(esc_ctrl = true) b cs s =
 let escaped_string ?esc_ctrl c cs s =
   buffer_add_escaped_string ?esc_ctrl (C.buffer c) cs s
 
+(* Things to remember when tweaking [buffer_add_escaped_text]
+
+   The text to escape is an inline node text. It can be preceeded by
+   or succeded by another inline, or not. This means that the begining
+   of the string is not necessarily the beginning of a line and its
+   end not necessarily the end of a line, but can be. Both the
+   beginning and the end should avoid having structural elements that
+   interact with the syntax of other inlines (e.g. an ending '~' if followed
+   by a strike-through potentially creates a fenced code block ~~~). *)
+
 let buffer_add_escaped_text b s =
   let esc_first b s = match s.[0] with
   | '-' | '+' | '_' | '=' as c ->
@@ -78,6 +88,9 @@ let buffer_add_escaped_text b s =
     while !k >= 0 && Cmarkit_base.Ascii.is_digit s.[!k] do decr k done;
     !k < 0
   in
+  let esc_hash s max prev next =
+    not (Char.equal prev '#')
+  in
   let flush b max start i =
     if start <= max then Buffer.add_substring b s start (i - start)
   in
@@ -88,7 +101,7 @@ let buffer_add_escaped_text b s =
     if Cmarkit_base.Ascii.is_control c then
       (flush b max start i; buffer_add_dec_esc b c; loop b s max next c next)
     else match c with
-    | '#' when not (Char.equal prev c) ->
+    | '#' when esc_hash s max prev next ->
         flush b max start i; buffer_add_bslash_esc b c; loop b s max next c next
     | '~' when esc_tilde s max prev next ->
         flush b max start i; buffer_add_bslash_esc b c; loop b s max next c next

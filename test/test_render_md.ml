@@ -95,9 +95,19 @@ let test_spec =
     end
   end;
   let total = List.length tests in
-  Test.log "%3d/%d are incorrect (can happen see docs)" !incorrect_count total;
-  Test.log "%3d/%d are only correct" !correct_count total;
-  Test.log "%3d/%d round trip" !trip_count total;
+  let results =
+    Fmt.str "@[<v>%3d/%d are incorrect (can happen see docs)@,\
+             %3d/%d are only correct@,%3d/%d round trip@]"
+      !incorrect_count total
+      !correct_count total
+      !trip_count total;
+  in
+  Test.log "%a" Fmt.lines results;
+  (* We also snapshots these results so that diffs are seen on changes *)
+  Snap.lines results @@ __POS_OF__
+{|  0/652 are incorrect (can happen see docs)
+274/652 are only correct
+378/652 round trip|};
   ()
 
 let main () =
