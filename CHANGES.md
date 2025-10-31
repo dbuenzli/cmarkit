@@ -1,18 +1,20 @@
+v0.4.0 2025-11-01 Zagreb
+------------------------
 
-
-- Support for the CommonMark 0.31.2 specification (#17)
+- Support for the CommonMark 0.31.2 specification (#17).
 
 - Change task items extension semantics: the task marker is no longer
   considered part of the list marker. The new semantics can lead to 
   surprises with item subparagraphs which can show up as indented code 
   blocks, but it avoids huge indentations for subtasks and is consistent 
-  with what at least GFM and md4c do.
+  with what at least GFM and `md4c` do.
   Thanks to Thomas Gazagnaire for the report (#24).
 
 - `Cmarkit_latex`. Add option `?first_heading_level` to the renderer
   to set the LaTeX heading level to use for the first CommonMark
   heading level. A corresponding option `--first-heading-level` is
-  added to `cmarkit latex`.  Thanks to Léo Andrès for the patch (#16).
+  added to `cmarkit latex`.
+  Thanks to Léo Andrès for the patch (#16).
 
 - `cmarkit html` command: add option `--body-id` to identify page body
   elements.
@@ -28,18 +30,17 @@
 - Fix incorrect parsing of code spans if they start with an escaped
   backtick (#21).
 
-- Fix incorrect escaping of backticks in CommonMark renderings
-  (#26).
+- Fix incorrect escaping of backticks in CommonMark renderings (#26).
 
 - Fix incorrect escaping of tildes for CommonMark rendering interpreted
-  with extensions (strikethrough).
+  with extensions (strikethrough becomes code fence).
   Thanks to Tianyi Song for the report (#20).
 
 - Fix `Cmarkit.Mapper`. Do not drop empty table cells.
   Thanks to Hannes Mehnert for the report (#14).
 
-- Fix out of bounds exception when lists are terminated by the end of
-  file. Thanks to Ty Overby for the report (#18).
+- Fix out of bounds exception when lists are terminated by the end of file. 
+  Thanks to Ty Overby for the report (#18).
 
 - Fix invalid HTML markup generated for cancelled task items.
   Thanks to Sebastien Mondet for the report (#15).
@@ -50,6 +51,7 @@
 - Updated data for Unicode 17.0.0.
 
 - Require (depopt) `cmdliner` 2.0.0.
+
 
 v0.3.0 2023-12-12 La Forclaz (VS)
 ---------------------------------
