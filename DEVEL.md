@@ -96,7 +96,7 @@ To update it invoke:
 
 ```sh
 opem install uucp
-b0 -- update_unicode_data
+b0 -- generate-data
 ```
 
 [`src/cmarkit_data_uchar.ml`]: src/cmarkit_data_uchar.ml

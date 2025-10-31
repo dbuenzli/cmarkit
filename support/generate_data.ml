@@ -3,6 +3,9 @@
    SPDX-License-Identifier: ISC
   ---------------------------------------------------------------------------*)
 
+let str = Format.sprintf
+let exec = Filename.basename Sys.executable_name
+
 let pp_uchar ppf u = Format.fprintf ppf "U+%04X" (Uchar.to_int u)
 
 let fold_uchars f acc =
@@ -65,13 +68,13 @@ let test () =
 
 let year = (Unix.gmtime (Unix.gettimeofday ())).Unix.tm_year + 1900
 
-let gen () =
+let gen ppf () =
   let pp_cp ppf u = Format.fprintf ppf "0x%04X" (Uchar.to_int u) in
   let pp_binding ppf (u, s) = Format.fprintf ppf "%a, \"%s\"" pp_cp u s in
   let pp_sep ppf () = Format.fprintf ppf ";@ " in
   let pp_cps ppf us = Format.pp_print_list ~pp_sep pp_cp ppf us in
   let pp_map ppf m = Format.pp_print_list ~pp_sep pp_binding ppf m in
-  Format.printf
+  Format.fprintf ppf
 {|(*---------------------------------------------------------------------------
    Copyright (c) %d The cmarkit programmers. All rights reserved.
    SPDX-License-Identifier: ISC
@@ -92,9 +95,37 @@ let case_fold =@?
 %!|} year Uucp.unicode_version pp_cps whitespace_list pp_cps punctuation_list
      pp_map case_fold_map
 
-let main () = match Array.to_list Sys.argv with
-| _ :: "-t" :: [] -> test ()
-| _ :: [] -> gen ()
-| _ -> Printf.printf "Usage: %s [-t]\n%!" Sys.argv.(0)
 
-let () = if !Sys.interactive then () else main ()
+let process do_test outf =
+  if do_test then test () else
+  let generate pp outf =
+    try
+      let oc = if outf = "-" then stdout else open_out_bin outf in
+      try
+        let ppf = Format.formatter_of_out_channel oc in
+        pp ppf ();
+        Format.pp_print_flush ppf ();
+        close_out oc
+      with Sys_error _ as e -> close_out oc; raise e
+    with Sys_error e -> Printf.eprintf "%s\n%!" e; exit 1
+  in
+  generate gen outf
+
+let main () =
+  let usage = str "Usage: %s [OPTION]…\nOptions:" exec in
+  let test = ref false in
+  let outf = ref None in
+  let options =
+    [ "-o", Arg.String (fun s -> outf := Some s),
+      "<FILE> output file, defaults to src/cmarkit_data_uchar.ml";
+      "-t", Arg.Set test,
+      "Do not generate, test data";
+    ]
+  in
+  let no_pos s = raise (Arg.Bad (str "Don't know what to do with %S" s)) in
+  Arg.parse (Arg.align options) no_pos usage;
+  let outf = Option.value ~default:"src/cmarkit_data_uchar.ml" !outf in
+  process !test outf;
+  0
+
+let () = if !Sys.interactive then () else exit (main ())

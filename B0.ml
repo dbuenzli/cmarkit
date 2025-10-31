@@ -29,24 +29,14 @@ let cmarkit_tool =
   let requires = [cmarkit; cmdliner] in
   B0_ocaml.exe "cmarkit" ~public:true ~doc:"The cmarkit tool" ~srcs ~requires
 
-(* Unicode support
+(* Unicode data support *)
 
-   N.B. we could do without both an exe and an action, cf. the Unicode libs. *)
-
-let unicode_data =
-  let srcs = [ `File ~/"support/unicode_data.ml" ] in
-  let requires = [uucp; unix] in
+let generate_data =
   let doc = "Generate cmarkit Unicode data" in
-  B0_ocaml.exe "unicode_data" ~doc ~srcs ~requires
-
-let update_unicode =
-  let doc = "Update Unicode character data " in
-  B0_unit.of_action "update_unicode_data" ~units:[unicode_data] ~doc @@
-  fun env _ ~args:_ ->
-  let* unicode_data = B0_env.unit_exe_file env unicode_data in
-  let outf = B0_env.in_scope_dir env ~/"src/cmarkit_data_uchar.ml" in
-  let outf = Os.Cmd.out_file ~force:true ~make_path:false outf in
-  Os.Cmd.run ~stdout:outf (Cmd.path unicode_data)
+  let srcs = [ `File ~/"support/generate_data.ml" ] in
+  let requires = [uucp; unix] in
+  let meta = B0_meta.(empty |> tag build |> ~~ B0_unit.Action.cwd `Scope_dir) in
+  B0_ocaml.exe "generate-data" ~doc ~srcs ~meta ~requires
 
 (* Tests *)
 
