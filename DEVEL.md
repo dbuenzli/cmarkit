@@ -47,9 +47,14 @@ standard output.
 
 ```sh
 b0 -- test_pathological -- cmark
-b0 -u cmarkit -- test_pathological -- $(b0 --path -- cmarkit html)
 b0 -- test_pathological --help
 b0 -- test_pathological --dump /tmp/ #   Dump tests and expectations
+```
+
+An action allows to run the tool on a build of the `cmarkit` tool:
+
+```
+b0 -- test_cmarkit_pathological
 ```
 
 [p]: https://github.com/commonmark/cmark/blob/master/test/pathological_tests.py

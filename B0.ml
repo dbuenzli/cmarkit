@@ -73,6 +73,21 @@ let test_pathological =
   let doc = "Test a CommonMark parser on pathological tests" in
   test ~/"test/test_pathological.ml" ~doc ~requires:[unix] ~run:false
 
+let test_cmarkit_pathological =
+  let doc = "Run pathological tests on the cmarkit tool" in
+  let units = [cmarkit_tool; test_pathological] in
+  let do_run = false (* switch to true when we pass *) in
+  let meta = B0_meta.(empty |> tag test |> ~~ run do_run) in
+  B0_unit.of_action' "test_cmarkit_pathological" ~doc ~units ~meta @@
+  fun env _ ~args ->
+  let* cmarkit = B0_env.unit_exe_file env cmarkit_tool in
+  let* test_pathological = B0_env.unit_exe_file_cmd env test_pathological in
+  let cmd = Cmd.(test_pathological %% args % "--" %% path cmarkit % "html") in
+  match Os.Cmd.run_status cmd with
+  | Ok (`Exited c) -> Ok (Os.Exit.Code c)
+  | Ok (`Signaled _ as st) -> Fmt.error "%a" Os.Cmd.pp_cmd_status (cmd, st)
+  | Error _ as e -> e
+
 let examples =
   let doc = "Doc sample code" in
   B0_ocaml.test ~/"test/examples.ml" ~doc ~run:false ~requires:[cmarkit]
