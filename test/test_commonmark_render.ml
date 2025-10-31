@@ -110,18 +110,18 @@ let test_spec =
   ()
 
 let main () =
-  let args =
-    let show_diff =
-      let doc = "Show diffs of correct CommonMark renders" in
-      Cmdliner.Arg.(value & flag & info ["show-diff"] ~doc)
-    in
-    Cmdliner.Term.(const (fun x y -> (x, y)) $ Spec.tests $ show_diff)
+  let show_diff =
+    let doc = "Show diffs of correct CommonMark renders" in
+    Cmdliner.Arg.(value & flag & info ["show-diff"] ~doc)
   in
-  Test.main' args @@ fun ((file, ids), show_diff) ->
-  let tests = Spec.parse_tests file |> Test.error_to_failstop in
-  let tests, label = Spec.select tests ids in
-  let args = Test.Arg.[value test_spec_args ((tests, label), show_diff)] in
-  Test.autorun ~args ()
+  Test.main' @@
+  let open Cmdliner.Term.Syntax in
+  let+ file = Spec.file and+ ids = Spec.ids and+ show_diff in
+  fun () ->
+    let tests = Spec.parse_tests file |> Test.error_to_failstop in
+    let tests, label = Spec.select tests ids in
+    let args = Test.Arg.[value test_spec_args ((tests, label), show_diff)] in
+    Test.autorun ~args ()
 
 let () =
   test_spec_fail_allowed := []; (* None at the moment *)

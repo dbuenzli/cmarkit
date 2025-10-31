@@ -3,9 +3,9 @@
    SPDX-License-Identifier: ISC
   ---------------------------------------------------------------------------*)
 
-open B0_std
+(** Specification test parser and runner *)
 
-(** Specification test parser and test runner *)
+open B0_std
 
 val version : string
 (** The specification version. *)
@@ -32,13 +32,15 @@ val select : test list -> id list -> test list * string
 (** [select tests ids] selects the tests with given [ids] (empty
     is all) and returns a label to print *)
 
-(** {1:testing Command line and testing} *)
-
-val tests : (Fpath.t * id list) Cmdliner.Term.t
-(** [tests] is a cmdliner term to specify a test file and a list of
-    examples identifiers to tests. *)
-
 val test_examples : label:string -> test list -> (test -> unit) -> unit
-(** [tests_exmples ts f] tests all [tests] with [f] as in a
+(** [tests_examples ts f] tests all [tests] with [f] as in a
     [B0_testing] block that reports assertion and failure counts as
     examples count. [label] is logged before the tests are performed.*)
+
+(** {1:cli Command line} *)
+
+val file : Fpath.t Cmdliner.Term.t
+(** [file] are options to specify the jsont test file. *)
+
+val ids : id list Cmdliner.Term.t
+(** [ids] are positional argument that specify a test file. *)

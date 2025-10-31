@@ -24,9 +24,12 @@ let test_spec =
   end
 
 let main () =
-  Test.main' Spec.tests @@ fun (file, ids) ->
-  let tests = Spec.parse_tests file |> Test.error_to_failstop in
-  let select = Spec.select tests ids in
-  Test.autorun ~args:Test.Arg.[value test_spec_args select] ()
+  Test.main' @@
+  let open Cmdliner.Term.Syntax in
+  let+ file = Spec.file and+ ids = Spec.ids in
+  fun () ->
+    let tests = Spec.parse_tests file |> Test.error_to_failstop in
+    let select = Spec.select tests ids in
+    Test.autorun ~args:Test.Arg.[value test_spec_args select] ()
 
 let () = if !Sys.interactive then () else exit (main ())

@@ -47,7 +47,22 @@ let select tests = function
     let ids = Fmt.str "@[%a@]" Fmt.(list ~sep:comma int) ids in
     Fmt.str "@[Testing example %a@]" Fmt.(truncated ~max:60) ids
 
-(* Cli and testing *)
+let test_examples ~label tests f =
+  (* We use a block to report number of tested examples *)
+  let open B0_testing in
+  let example = Fmt.cardinal ~one:(Fmt.any "example") () in
+  let pass ?__POS__ count =
+    Test.log "%a %a %a" Test.Fmt.count count example count Test.Fmt.passed ()
+  in
+  let fail ?__POS__ count ~assertions =
+    Test.log "%a %a %a"
+      Test.Fmt.fail_count_ratio (count, assertions) example assertions
+      Test.Fmt.failed ()
+  in
+  Test.log "%s" label;
+  Test.block ~pass ~fail (fun () -> List.iter f tests)
+
+(* Command line *)
 
 let range_conv =
   let parser s = match int_of_string_opt s with
@@ -58,7 +73,7 @@ let range_conv =
         let (l, r) = String.split_first ~sep:"-" s |> exit_on_none in
         let l = int_of_string_opt l |> exit_on_none in
         let r = int_of_string_opt r |> exit_on_none in
-          let lo, hi = if l < r then l, r else r, l in
+        let lo, hi = if l < r then l, r else r, l in
         let acc = ref [] in
         for i = hi downto lo do acc := i :: !acc done;
         Ok !acc
@@ -80,20 +95,3 @@ let file =
   let doc = "$(docv) is the test file." in
   let default = Fpath.v "test/spec.json" in
   Cmdliner.Arg.(value & opt B0_std_cli.filepath default & info ["file"] ~doc)
-
-let tests = Cmdliner.Term.(const (fun x y -> x, y) $ file $ ids)
-
-let test_examples ~label tests f =
-  (* We use a block to report number of tested examples *)
-  let open B0_testing in
-  let example = Fmt.cardinal ~one:(Fmt.any "example") () in
-  let pass ?__POS__ count =
-    Test.log "%a %a %a" Test.Fmt.count count example count Test.Fmt.passed ()
-  in
-  let fail ?__POS__ count ~assertions =
-    Test.log "%a %a %a"
-      Test.Fmt.fail_count_ratio (count, assertions) example assertions
-      Test.Fmt.failed ()
-  in
-  Test.log "%s" label;
-  Test.block ~pass ~fail (fun () -> List.iter f tests)

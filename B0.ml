@@ -40,6 +40,9 @@ let generate_data =
 
 (* Tests *)
 
+let test ?(requires = []) =
+  B0_ocaml.test ~requires:(cmdliner :: b0_std :: cmarkit :: requires)
+
 let update_spec_tests =
   let doc = "Update the CommonMark spec tests" in
   B0_unit.of_action "update_spec_tests" ~doc @@
@@ -55,18 +58,24 @@ let spec_srcs = [`File ~/"test/spec.mli"; `File ~/"test/spec.ml"]
 
 let test_spec =
   let doc = "Test CommonMark specification conformance tests" in
-  let requires = [cmdliner; b0_std; cmarkit] in
-  B0_ocaml.test ~/"test/test_spec.ml" ~doc ~srcs:spec_srcs ~requires
+  test ~/"test/test_spec.ml" ~doc ~srcs:spec_srcs
 
-let test_trip =
+let test_commonmark_render =
   let doc = "Test CommonMark renderer (notably on conformance tests)" in
-  let requires = [cmdliner; b0_std; cmarkit] in
-  B0_ocaml.test ~/"test/test_render_md.ml" ~doc ~srcs:spec_srcs ~requires
+  test ~/"test/test_commonmark_render.ml" ~doc ~srcs:spec_srcs
 
 let test_bugs =
   let doc = "Tests for reported issues" in
   let requires = [cmdliner; b0_std; cmarkit] in
   B0_ocaml.test ~/"test/test_issues.ml" ~doc ~requires
+
+let test_pathological =
+  let doc = "Test a CommonMark parser on pathological tests" in
+  test ~/"test/test_pathological.ml" ~doc ~requires:[unix] ~run:false
+
+let examples =
+  let doc = "Doc sample code" in
+  B0_ocaml.test ~/"test/examples.ml" ~doc ~run:false ~requires:[cmarkit]
 
 let bench =
   let doc = "Simple standard CommonMark to HTML renderer for benchmarking" in
@@ -75,17 +84,10 @@ let bench =
   let meta = B0_meta.(empty |> tag bench) in
   B0_ocaml.exe "bench" ~doc ~meta ~srcs ~requires
 
-let pathological =
-  let doc = "Test a CommonMark parser on pathological tests." in
-  let srcs = [ `File ~/"test/pathological.ml" ] in
-  let requires = [b0_std; unix] in
-  B0_ocaml.exe "pathological" ~doc ~srcs ~requires
+(* Expectation tests
 
-let examples =
-  let doc = "Doc sample code" in
-  B0_ocaml.test ~/"test/examples.ml" ~doc ~run:false ~requires:[cmarkit]
-
-(* Expectation tests *)
+   FIXME eventually get rid of B0_expect. We need to meld it
+   into B0_testing. *)
 
 let expect_cmarkit_renders ctx =
   let cmarkit = B0_expect.get_unit_exe_file_cmd ctx cmarkit_tool in
