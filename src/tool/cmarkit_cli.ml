@@ -50,7 +50,7 @@ let docu =
 let files =
   let doc = "$(docv) is the CommonMark file to process (repeatable). Reads \
              from $(b,stdin) if none or $(b,-) is specified." in
-  Arg.(value & pos_all string ["-"] & info [] ~doc ~docv:"FILE.md")
+  Arg.(value & pos_all filepath ["-"] & info [] ~doc ~docv:"FILE.md")
 
 let heading_auto_ids =
   let doc = "Automatically generate heading identifiers." in

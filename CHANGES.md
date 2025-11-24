@@ -1,3 +1,7 @@
+
+
+- `cmarkit` tool: enable file completion on file arguments.
+
 v0.4.0 2025-11-01 Zagreb
 ------------------------
 

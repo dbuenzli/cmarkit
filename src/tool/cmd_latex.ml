@@ -163,7 +163,7 @@ let inline_preambles =
      directly in the document (use $(b,-k) to keep it even when this option \
      is specified). Repeatable."
   in
-  Arg.(value & opt_all string [] &
+  Arg.(value & opt_all filepath [] &
        info ~doc ["inline-preamble"] ~docv:"FILE.latex")
 
 let keep_built_in_preamble =

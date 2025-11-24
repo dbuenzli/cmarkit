@@ -195,7 +195,7 @@ let inline_csss =
      even when this option is specified). Repeatable (gets in separate \
      $(b,style) elements)."
   in
-  Arg.(value & opt_all string [] & info ~doc ["inline-css"] ~docv:"FILE.css")
+  Arg.(value & opt_all filepath [] & info ~doc ["inline-css"] ~docv:"FILE.css")
 
 let keep_built_in_css =
   let doc =
@@ -217,7 +217,7 @@ let inline_jss =
      $(b,--doc) is used. Repeatable (gets in separate \
      $(b,script) elements)."
   in
-  Arg.(value & opt_all string [] & info ~doc ["inline-js"] ~docv:"FILE.js")
+  Arg.(value & opt_all filepath [] & info ~doc ["inline-js"] ~docv:"FILE.js")
 
 let layout =
   let doc = "Keep layout information (has no effect on rendering)." in
