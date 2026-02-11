@@ -39,16 +39,16 @@ let checked_commonmark ?layout ~strict src =
 let test_dot_escapes =
   Test.test "item maker escapes renders (#19)" @@ fun () ->
   let src = {|3.14 is pi|} in
-  Snap.lines (checked_commonmark ~strict:true src) @@ __POS_OF__
+  Snap.lines (checked_commonmark ~strict:true src) @> __POS_OF__
     {|3.14 is pi|};
   let src = {|pi is 3.14|} in
-  Snap.lines (checked_commonmark ~strict:true src) @@ __POS_OF__
+  Snap.lines (checked_commonmark ~strict:true src) @> __POS_OF__
     {|pi is 3.14|};
   let src = {|pi is approximately 3.|} in
-  Snap.lines (checked_commonmark ~strict:true src) @@ __POS_OF__
+  Snap.lines (checked_commonmark ~strict:true src) @> __POS_OF__
     {|pi is approximately 3.|};
   let src = {|3\. is approximately pi|} in
-  Snap.lines (checked_commonmark ~strict:true src) @@ __POS_OF__
+  Snap.lines (checked_commonmark ~strict:true src) @> __POS_OF__
     {|3\. is approximately pi|};
   let src =
 {|1\.
@@ -56,7 +56,7 @@ Above needs an escape below does not (but we don't have the state)
 1.
 |}
   in
-  Snap.lines (checked_commonmark ~strict:true src) @@ __POS_OF__
+  Snap.lines (checked_commonmark ~strict:true src) @> __POS_OF__
 {|1\.
 Above needs an escape below does not (but we don't have the state)
 1\.
@@ -66,19 +66,19 @@ Above needs an escape below does not (but we don't have the state)
 let test_hash_escapes =
   Test.test "hash escapes renders (#25)" @@ fun () ->
   let src = {|hello #world|} in
-  Snap.lines (checked_commonmark ~strict:true src) @@ __POS_OF__
+  Snap.lines (checked_commonmark ~strict:true src) @> __POS_OF__
     {|hello #world|};
-  Snap.lines (checked_commonmark ~strict:false src) @@ __POS_OF__
+  Snap.lines (checked_commonmark ~strict:false src) @> __POS_OF__
     {|hello #world|};
   let src = {|## foo #\##|} in
-  Snap.lines (checked_commonmark ~strict:true src) @@ __POS_OF__
+  Snap.lines (checked_commonmark ~strict:true src) @> __POS_OF__
     {|## foo ##\#|};
-  Snap.lines (checked_commonmark ~strict:false src) @@ __POS_OF__
+  Snap.lines (checked_commonmark ~strict:false src) @> __POS_OF__
     {|## foo ##\#|};
   let src = {|### foo ###     |} in
-  Snap.lines (checked_commonmark ~layout:false ~strict:true src) @@ __POS_OF__
+  Snap.lines (checked_commonmark ~layout:false ~strict:true src) @> __POS_OF__
     {|### foo|};
-  Snap.lines (checked_commonmark ~strict:false src) @@ __POS_OF__
+  Snap.lines (checked_commonmark ~strict:false src) @> __POS_OF__
     {|### foo ###     |};
   ()
 
@@ -87,18 +87,18 @@ let test_tilde_escapes =
   (* The escaping here differs in strict or non-strict mode because
      the AST is different *)
   let src = {|\~~~strike me~~|} in
-  Snap.lines (checked_commonmark ~strict:true src) @@ __POS_OF__
+  Snap.lines (checked_commonmark ~strict:true src) @> __POS_OF__
     {|\~~~strike me\~~|};
-  Snap.lines (checked_commonmark ~strict:false src) @@ __POS_OF__
+  Snap.lines (checked_commonmark ~strict:false src) @> __POS_OF__
     {|\~~~strike me~~|};
   ()
 
 let test_backtick_escapes =
   Test.test "backtick escapes renders (#26)" @@ fun () ->
   let src = {|```foo``|} (* This is not code *) in
-  Snap.lines (checked_commonmark ~strict:true src) @@ __POS_OF__
+  Snap.lines (checked_commonmark ~strict:true src) @> __POS_OF__
     {|\`\`\`foo\`\`|};
-  Snap.lines (checked_commonmark ~strict:false src) @@ __POS_OF__
+  Snap.lines (checked_commonmark ~strict:false src) @> __POS_OF__
     {|\`\`\`foo\`\`|};
   ()
 
@@ -107,10 +107,10 @@ let test_code_span_escape =
   let this_is_code =
 {|\```the code``|}
   in
-  Snap.lines (html ~strict:true this_is_code) @@ __POS_OF__
+  Snap.lines (html ~strict:true this_is_code) @> __POS_OF__
 {|<p>`<code>the code</code></p>
 |};
-  Snap.lines (html ~strict:false this_is_code) @@ __POS_OF__
+  Snap.lines (html ~strict:false this_is_code) @> __POS_OF__
 {|<p>`<code>the code</code></p>
 |};
   ()
@@ -124,7 +124,7 @@ let test_nested_tasks =
   - [ ] sub
 |}
   in
-  Snap.lines (html ~strict:true tasks) @@ __POS_OF__
+  Snap.lines (html ~strict:true tasks) @> __POS_OF__
 {|<ul>
 <li>[ ] hey</li>
 <li>[ ] ho
@@ -134,7 +134,7 @@ let test_nested_tasks =
 </li>
 </ul>
 |};
-  Snap.lines (html ~strict:false tasks) @@ __POS_OF__
+  Snap.lines (html ~strict:false tasks) @> __POS_OF__
 {|<ul>
 <li><div class="task"><input type="checkbox" disabled><div>hey</div></div></li>
 <li><div class="task"><input type="checkbox" disabled><div>ho
@@ -151,7 +151,7 @@ let test_nested_tasks =
       description
 |}
   in
-  Snap.lines (html ~strict:false indentation_woes) @@ __POS_OF__
+  Snap.lines (html ~strict:false indentation_woes) @> __POS_OF__
 {|<ul>
 <li><div class="task"><input type="checkbox" disabled><div>
 <p>task</p>
@@ -174,7 +174,7 @@ let test_mapper_table_bug_14 =
   let doc = Cmarkit.Doc.of_string ~layout:true ~strict:false table in
   let mdoc = Cmarkit.Mapper.map_doc (Cmarkit.Mapper.make ()) doc in
   let mdoc = Cmarkit_commonmark.of_doc mdoc in
-  Snap.lines mdoc @@ __POS_OF__
+  Snap.lines mdoc @> __POS_OF__
     "| a | b | c |\n\
      |---|---|---|\n\
      | a | b | c |\n\

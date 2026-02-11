@@ -103,7 +103,7 @@ let test_spec =
   in
   Test.log "%a" Fmt.lines results;
   (* We also snapshots these results so that diffs are seen on changes *)
-  Snap.lines results @@ __POS_OF__
+  Snap.lines results @> __POS_OF__
 {|  0/652 are incorrect (can happen see docs)
 274/652 are only correct
 378/652 round trip|};
