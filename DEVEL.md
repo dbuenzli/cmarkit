@@ -62,12 +62,12 @@ b0 -- test_cmarkit_pathological
 
 # Expectation tests
 
-To add a new test, add an `.md` test in `test/expect`, run the tests
+To add a new test, add an `.md` test in `test/snapshot`, run the tests
 and add the new generated files to the repo.
 
 ```sh
-b0 -- expect
-b0 -- expect --help 
+b0 -- test_cmarkit_tool
+b0 -- test_cmakrit_tool --correct
 ```
 
 # Specification update

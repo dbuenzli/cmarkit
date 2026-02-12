@@ -88,6 +88,22 @@ let test_cmarkit_pathological =
   | Ok (`Signaled _ as st) -> Fmt.error "%a" Os.Cmd.pp_cmd_status (cmd, st)
   | Error _ as e -> e
 
+let test_cmarkit_tool =
+  (* b0: TODO streamline this *)
+  let env env _ =
+    let* exe = B0_env.unit_exe_file env cmarkit_tool in
+    let env = B0_env.build_env env in
+    Ok (Os.Env.add "B0_TESTING_CMARKIT" (Fpath.to_string exe) env)
+  in
+  let meta =
+    B0_meta.empty
+    |> ~~ B0_unit.Action.env (`Fun (("testing-setup", env)))
+    |> ~~ B0_unit.Action.units [cmarkit_tool]
+  in
+  let doc = "Test jsont tool" in
+  let requires = [b0_std] in
+  test ~/"test/test_cmarkit_tool.ml" ~meta ~run:true ~requires ~doc
+
 let examples =
   let doc = "Doc sample code" in
   B0_ocaml.test ~/"test/examples.ml" ~doc ~run:false ~requires:[cmarkit]
@@ -98,45 +114,6 @@ let bench =
   let requires = [cmarkit] in
   let meta = B0_meta.(empty |> tag bench) in
   B0_ocaml.exe "bench" ~doc ~meta ~srcs ~requires
-
-(* Expectation tests
-
-   FIXME eventually get rid of B0_expect. We need to meld it
-   into B0_testing. *)
-
-let expect_cmarkit_renders ctx =
-  let cmarkit = B0_expect.get_unit_exe_file_cmd ctx cmarkit_tool in
-  let renderers = (* command, output suffix *)
-    [ Cmd.(arg "html" % "-c" % "--unsafe"), ".html";
-      Cmd.(arg "latex"), ".latex";
-      Cmd.(arg "commonmark"), ".trip.md";
-      Cmd.(arg "locs"), ".locs";
-      Cmd.(arg "locs" % "--no-layout"), ".nolayout.locs"; ]
-  in
-  let test_renderer ctx cmarkit file (cmd, ext) =
-    let with_exts = Fpath.has_ext ".exts.md" file in
-    let cmd = Cmd.(cmd %% if' with_exts (arg "--exts") %% path file) in
-    let cwd = B0_expect.base ctx and stdout = Fpath.(file -+ ext) in
-    B0_expect.stdout ctx ~cwd ~stdout Cmd.(cmarkit %% cmd)
-  in
-  let test_file ctx cmarkit file =
-    List.iter (test_renderer ctx cmarkit file) renderers
-  in
-  let test_files =
-    let base_files = B0_expect.base_files ctx ~rel:true ~recurse:false in
-    let input f = Fpath.has_ext ".md" f && not (Fpath.has_ext ".trip.md" f) in
-    List.filter input base_files
-  in
-  List.iter (test_file ctx cmarkit) test_files
-
-let expect =
-  let doc = "Test expectations" in
-  let meta = B0_meta.(empty |> tag test |> tag run) in
-  let units = [cmarkit_tool] in
-  B0_unit.of_action' "expect" ~meta ~units ~doc @@
-  B0_expect.action_func ~base:(Fpath.v "test/expect") @@ fun ctx ->
-  expect_cmarkit_renders ctx;
-  ()
 
 (* Packs *)
 
