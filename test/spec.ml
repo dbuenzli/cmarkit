@@ -48,19 +48,8 @@ let select tests = function
     Fmt.str "@[Testing example %a@]" Fmt.(truncated ~max:60) ids
 
 let test_examples ~label tests f =
-  (* We use a block to report number of tested examples *)
-  let open B0_testing in
-  let example = Fmt.cardinal ~one:(Fmt.any "example") () in
-  let pass ?__POS__ count =
-    Test.log "%a %a %a" Test.Fmt.count count example count Test.Fmt.passed ()
-  in
-  let fail ?__POS__ count ~assertions =
-    Test.log "%a %a %a"
-      Test.Fmt.fail_count_ratio (count, assertions) example assertions
-      Test.Fmt.failed ()
-  in
-  Test.log "%s" label;
-  Test.block ~pass ~fail (fun () -> List.iter f tests)
+  B0_testing.Test.Log.msg "%s" label;
+  B0_testing.Test.block ~kind:"example" (fun () -> List.iter f tests)
 
 (* Command line *)
 

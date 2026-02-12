@@ -21,7 +21,7 @@ let correct_commonmark_render ?(layout = true) ~strict ~fnd ~exp () =
   begin
     let kind = if strict then "strict" else "extended" in
     Test.fail "Incorrect %s CommonMark rendering" kind;
-    Test.log_raw
+    Test.Log.raw
       "@[<v>Source:@,%a@,Markdown render diff:@,%a\
        HTML render diff:@,%a@]@?"
       Fmt.lines exp

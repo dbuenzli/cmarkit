@@ -52,7 +52,7 @@ let test_locs =
 let get_cmarkit_cmd () =
   let var = "B0_TESTING_CMARKIT" in
   match Os.Env.var ~empty_is_none:true var with
-  | None -> Fmt.error "%s unspecified, needs to point to jsont executable" var
+  | None -> Fmt.error "%s unspecified, needs to point to cmarkit executable" var
   | Some cmd -> Ok (Cmd.tool cmd)
 
 let get_srcs dir =
@@ -70,13 +70,9 @@ let main () =
   Test.main @@ fun () ->
   Test.error_to_failstop @@
   let* cmd = get_cmarkit_cmd () in
-  let* snapshot_dir = match Test.Patch.src_root () with
-  | Some root -> Ok (Fpath.(root / "snapshots"))
-  | None ->
-      let* cwd = Os.Dir.cwd () in
-      Ok (Fpath.(cwd // v "test/snapshots"))
-  in
+  let snapshot_dir = Fpath.(Test.dir () / "snapshots") in
   let* srcs = get_srcs snapshot_dir in
-  Ok (Test.autorun ~args:Test.Arg.[value args (cmd, snapshot_dir, srcs)] ())
+  let args = Test.Arg.[value args (cmd, snapshot_dir, srcs)] in
+  Ok (Test.autorun ~args ())
 
 let () = if !Sys.interactive then () else exit (main ())

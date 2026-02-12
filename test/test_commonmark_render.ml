@@ -11,11 +11,11 @@ let renderer = (* Specification tests render empty elements as XHTML. *)
   Cmarkit_html.xhtml_renderer ~safe:false ()
 
 let log_render_md_diff t ~fnd =
-  Test.log_raw "@[<v>Render diff for %a@,%a@]@?"
+  Test.Log.raw "@[<v>Render diff for %a@,%a@]@?"
     Spec.pp_test_url t (Test.Diff.pp Test.T.lines ~fnd ~exp:t.markdown) ()
 
 let log_render_html_diff t ~fnd =
-  Test.log_raw "@[<v>Render HTML diff for %a@,%a@]@?"
+  Test.Log.raw "@[<v>Render HTML diff for %a@,%a@]@?"
     Spec.pp_test_url t (Test.Diff.pp Test.T.lines ~fnd ~exp:t.html) ()
 
 (* Tests *)
@@ -35,7 +35,7 @@ let test_spec_no_layout =
   then (Test.pass (); if show_diff then log_render_md_diff t ~fnd:md) else
   begin
     Test.fail "%a" Spec.pp_test_url t;
-    Test.log_raw
+    Test.Log.raw
       "@[<v>Incorrect with no layout parse@,Source:@,%aMarkdown render:@,%a\
        HTML render:@,%a@]@?"
       Fmt.lines t.Spec.markdown
@@ -71,7 +71,7 @@ let test_spec =
         if Option.is_some notrip_reason then begin
           Test.pass ();
           if show_diff then begin
-            Test.log_raw "Only correct because: %s" (Option.get notrip_reason);
+            Test.Log.raw "Only correct because: %s" (Option.get notrip_reason);
             log_render_md_diff t ~fnd:md
           end
         end else begin
@@ -101,7 +101,7 @@ let test_spec =
       !correct_count total
       !trip_count total;
   in
-  Test.log "%a" Fmt.lines results;
+  Test.Log.msg "%a" Fmt.lines results;
   (* We also snapshots these results so that diffs are seen on changes *)
   Snap.lines results @> __POS_OF__
 {|  0/652 are incorrect (can happen see docs)

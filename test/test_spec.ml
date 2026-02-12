@@ -18,7 +18,7 @@ let test_spec =
   if String.equal html t.html then Test.pass () else
   begin
     Test.fail "%a" Spec.pp_test_url t;
-    Test.log_raw "@[<v>Source:@,%aRender:@,%a@]@?"
+    Test.Log.raw "@[<v>Source:@,%aRender:@,%a@]@?"
       Fmt.lines t.Spec.markdown
       (Test.Diff.pp Test.T.lines ~fnd:html ~exp:t.html) ()
   end

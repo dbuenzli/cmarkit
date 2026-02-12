@@ -152,7 +152,7 @@ let run_test t (timeout, cmd) =
       let fnd = massage fnd in
       if String.equal (String.trim t.exp) fnd then begin
         Test.pass ();
-        Test.log " %a in %a" Test.Fmt.passed () Mtime.Span.pp dur;
+        Test.Log.msg " %a in %a" Test.Fmt.passed () Mtime.Span.pp dur;
         Ok ()
       end else begin
         let pp_data = Fmt.truncated ~max:50 in
@@ -180,8 +180,8 @@ let test_pathological ~timeout_s ~dump ~tool ~tool_args () = match dump with
         let timeout = Mtime.Span.(timeout_s * s) in
         let cmd = Cmd.(tool t %% list tool_args) in
         List.iter (fun t -> let t = mk_test t in ignore t) tests;
-        Test.log "Testing tool %s" t;
-        Test.log "Timeout after: %a" Mtime.Span.pp timeout;
+        Test.Log.msg "Testing tool %s" t;
+        Test.Log.msg "Timeout after: %a" Mtime.Span.pp timeout;
         let args = Test.Arg.[value params (timeout, cmd)] in
         Test.autorun ~args ()
 
