@@ -115,6 +115,11 @@ val buffer_add_pct_encoded_string : Buffer.t -> string -> unit
 (** [buffer_add_pct_encoded_string b s] is {!pct_encoded_string} but
     appends to a buffer value. *)
 
+val generate_unique_id : Cmarkit_renderer.context -> string -> string
+(** [generate_unique_id c id] is [id] on the first call to the function with
+    [c]. Subsequent calls with [c] and [id] each generate a new unique
+    identifier of the form [id-$NUM] with [$NUM] a decimal number. *)
+
 (** {1:integration HTML integration notes}
 
     {2:code_blocks Code blocks}

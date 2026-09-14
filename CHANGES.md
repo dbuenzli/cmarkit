@@ -1,4 +1,7 @@
 
+- Expose `Cmarkit_html.generate_unique_id` in the API. Thanks to Merlin04 for
+  the suggestion (#33).
+
 - `Cmarkit_html.of_doc`: fix `backend_blocks` functionality being ignored.
   Thanks to Paul-Elliot Anglès d'Auriac for the fix (#30).
 

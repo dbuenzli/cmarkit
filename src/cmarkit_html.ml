@@ -26,7 +26,7 @@ let init_context ?(backend_blocks = false) ~safe c _ =
   let st = { safe; backend_blocks; ids; footnote_count = 0; footnotes } in
   C.State.set c state (Some st)
 
-let unique_id c id =
+let generate_unique_id c id =
   let st = C.State.get c state in
   let rec loop ids id c =
     let id' = if c = 0 then id else (String.concat "-" [id; Int.to_string c]) in
@@ -306,7 +306,7 @@ let heading c h =
   begin match Block.Heading.id h with
   | None -> C.byte c '>';
   | Some (`Auto id | `Id id) ->
-      let id = unique_id c id in
+      let id = generate_unique_id c id in
       C.string c " id=\""; C.string c id;
       C.string c "\"><a class=\"anchor\" aria-hidden=\"true\" href=\"#";
       C.string c id; C.string c "\"></a>";
